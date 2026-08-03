@@ -1,6 +1,6 @@
 $react_vite_mui_project_config_content = @'
 import { defineConfig } from 'vite';
-import path from 'path';
+import { fileURLToPath, URL } from 'node:url';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 
@@ -8,16 +8,13 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
     server: {
         port: 5173,
-        host: "::"
+        host: '0.0.0.0',
+        open: true,
     },
-    plugins: [
-        react(),
-        tailwindcss()
-    ],
+    plugins: [react(), tailwindcss()],
     resolve: {
-        tsconfigPaths: true,
         alias: {
-            '@': path.resolve(__dirname, 'src'),
+            '@': fileURLToPath(new URL('./src', import.meta.url)),
         },
     },
 });
@@ -27,9 +24,10 @@ $react_vite_mui_project_tsconfig_app_content = @'
 {
     "compilerOptions": {
         "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
-        "target": "es2023",
-        "lib": ["ES2023", "DOM", "DOM.Iterable"],
-        "module": "esnext",
+        "target": "ES2022",
+        "useDefineForClassFields": true,
+        "lib": ["ES2022", "DOM", "DOM.Iterable"],
+        "module": "ESNext",
         "types": ["vite/client"],
         "skipLibCheck": true,
 
@@ -42,17 +40,17 @@ $react_vite_mui_project_tsconfig_app_content = @'
         "jsx": "react-jsx",
 
         /* Linting */
+        "strict": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "erasableSyntaxOnly": true,
         "noFallthroughCasesInSwitch": true,
+        "noUncheckedSideEffectImports": true,
 
         /* Alias @ = src */
-        "baseUrl": ".",
         "paths": {
-            "@/*": ["src/*"]
-        },
-        "ignoreDeprecations": "6.0"
+            "@/*": ["./src/*"]
+        }
     },
     "include": ["src"]
 }
@@ -82,12 +80,12 @@ createRoot(document.getElementById('root')!).render(
                 <RouterProvider router={router} />
             </StyledEngineProvider>
         </ThemeProviderWrapper>
-    </StrictMode>
+    </StrictMode>,
 );
 '@
 
 $react_vite_mui_project_theme_content = @'
-import { createContext, type ReactNode, useContext, useEffect, useState, useMemo } from 'react';
+import { createContext, type ReactNode, useContext, useEffect, useMemo, useState } from 'react';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 
 type ThemeMode = 'light' | 'dark' | 'system';
@@ -113,34 +111,32 @@ export function ThemeProviderWrapper({ children }: Props) {
     const [mode, setMode] = useState<ThemeMode>(() => {
         return (localStorage.getItem('theme') as ThemeMode) || 'system';
     });
+    const [systemDark, setSystemDark] = useState(() =>
+        window.matchMedia('(prefers-color-scheme: dark)').matches,
+    );
+
+    useEffect(() => {
+        const media = window.matchMedia('(prefers-color-scheme: dark)');
+        const onChange = () => setSystemDark(media.matches);
+        media.addEventListener('change', onChange);
+        return () => media.removeEventListener('change', onChange);
+    }, []);
+
+    const isDark = mode === 'system' ? systemDark : mode === 'dark';
 
     useEffect(() => {
         const root = document.documentElement;
-        let isDark: boolean;
-        if (mode === 'system') {
-            isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        } else {
-            isDark = mode === 'dark';
-        }
-
-        if (isDark) root.classList.add('dark');
-        else root.classList.remove('dark');
-
+        root.classList.toggle('dark', isDark);
         localStorage.setItem('theme', mode);
-    }, [mode]);
+    }, [mode, isDark]);
 
-    const muiTheme = useMemo(() => {
-        let muiMode: 'light' | 'dark';
-        if (mode === 'system') {
-            muiMode = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        } else {
-            muiMode = mode;
-        }
-
-        return createTheme({
-            palette: { mode: muiMode, primary: { main: '#06b6d4' } },
-        });
-    }, [mode]);
+    const muiTheme = useMemo(
+        () =>
+            createTheme({
+                palette: { mode: isDark ? 'dark' : 'light', primary: { main: '#06b6d4' } },
+            }),
+        [isDark],
+    );
 
     return (
         <ThemeContext.Provider value={{ mode, setMode }}>
@@ -170,7 +166,7 @@ const router = createBrowserRouter([
         path: '/',
         element: <DefaultLayout />,
         children: [
-            { index: true, element: <Navigate to="/home" />, },
+            { index: true, element: <Navigate to="/home" /> },
             { path: '/home', element: <Home /> },
         ],
     },
@@ -183,40 +179,49 @@ export default router;
 
 $react_vite_mui_project_home_page_content = @'
 import { Button } from '@mui/material';
+import { Home as HomeIcon, MenuBook, RocketLaunch } from '@mui/icons-material';
 import ToggleMode from '@/components/ToggleMode';
-import { Home } from '@mui/icons-material';
 
 export default function HomePage() {
     return (
-        <main className="min-h-screen flex flex-col items-center justify-center px-6 text-center bg-linear-to-br from-cyan-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors">
-            <Home className="text-cyan-600 dark:text-cyan-400 text-7xl mb-6 animate-bounce" />
+        <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 py-16 text-center bg-linear-to-br from-slate-50 via-white to-indigo-50 transition-colors dark:from-gray-950 dark:via-gray-900 dark:to-indigo-950">
+            <div className="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-cyan-400/20 blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-purple-500/20 blur-3xl" />
 
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-8 drop-shadow-lg">
+            <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-200/60 bg-white/60 px-4 py-1.5 text-xs font-semibold tracking-wider text-cyan-700 uppercase shadow-sm backdrop-blur dark:border-cyan-800 dark:bg-gray-800/60 dark:text-cyan-300">
+                <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-cyan-500" />
+                </span>
+                React 19 • Material UI
+            </span>
+
+            <span className="mb-8 inline-flex h-20 w-20 items-center justify-center rounded-2xl bg-linear-to-br from-cyan-500 to-purple-500 text-white shadow-lg shadow-cyan-500/25">
+                <HomeIcon fontSize="large" />
+            </span>
+
+            <h1 className="mb-5 max-w-2xl text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl dark:text-white">
                 Bienvenue sur votre projet React
             </h1>
 
-            <p className="text-lg sm:text-xl md:text-2xl text-gray-600 dark:text-gray-300 max-w-2xl mb-10 leading-relaxed">
+            <p className="mb-10 max-w-2xl text-lg leading-relaxed text-gray-600 sm:text-xl dark:text-gray-300">
                 Ce projet est pré-configuré avec{' '}
-                <span className="font-semibold text-cyan-600 dark:text-cyan-400"> Material UI</span>
-                ,
-                <span className="font-semibold text-purple-600 dark:text-purple-300">
-                    {' '}
-                    TailwindCSS
-                </span>{' '}
+                <span className="font-semibold text-cyan-600 dark:text-cyan-400"> Material UI</span>,
+                <span className="font-semibold text-purple-600 dark:text-purple-400"> TailwindCSS</span>{' '}
                 et
-                <span className="font-semibold text-pink-600 dark:text-pink-300">
+                <span className="font-semibold text-pink-600 dark:text-pink-400">
                     {' '}
                     Material Icons{' '}
                 </span>
                 pour un développement rapide et élégant.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-6 justify-center">
+            <div className="flex flex-col items-center gap-4 sm:flex-row">
                 <Button
                     variant="contained"
                     size="large"
-                    className="bg-linear-to-r from-cyan-500 to-purple-500 hover:from-purple-500 hover:to-cyan-500 text-white shadow-lg transition-all transform hover:-translate-y-1"
-                    startIcon={<Home />}
+                    startIcon={<RocketLaunch />}
+                    className="bg-linear-to-r from-cyan-500 to-purple-500 text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:from-purple-500 hover:to-cyan-500"
                 >
                     Démarrer
                 </Button>
@@ -224,13 +229,14 @@ export default function HomePage() {
                 <Button
                     variant="outlined"
                     size="large"
-                    className="text-purple-600 dark:text-purple-300 border border-purple-600 dark:border-purple-300 hover:bg-purple-50 dark:hover:bg-purple-700 dark:hover:text-white shadow-md transition-all transform hover:-translate-y-1"
+                    startIcon={<MenuBook />}
+                    className="border-purple-300 text-purple-600 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-purple-50 dark:border-purple-700 dark:text-purple-300 dark:hover:bg-purple-900/50"
                 >
                     Documentation
                 </Button>
             </div>
 
-            <ToggleMode className="fixed top-4 right-5" />
+            <ToggleMode className="fixed top-5 right-5 z-50" />
         </main>
     );
 }
@@ -241,34 +247,40 @@ import { Button } from '@mui/material';
 import { Block, Home } from '@mui/icons-material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Link, useNavigate } from 'react-router-dom';
+import ToggleMode from '@/components/ToggleMode';
 
 export default function NotFound() {
     const navigate = useNavigate();
 
     return (
-        <main className="min-h-screen flex flex-col items-center justify-center px-6 text-center bg-linear-to-br from-cyan-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors">
-            <Block className="text-pink-600 dark:text-pink-400 text-7xl mb-6 animate-pulse" />
+        <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 py-16 text-center bg-linear-to-br from-slate-50 via-white to-indigo-50 transition-colors dark:from-gray-950 dark:via-gray-900 dark:to-indigo-950">
+            <div className="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-pink-400/20 blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-purple-500/20 blur-3xl" />
 
-            <span className="text-sm font-semibold px-4 py-1 rounded-full bg-pink-100 text-pink-600 dark:bg-pink-900 dark:text-pink-300 mb-4 shadow">
+            <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-pink-200/60 bg-white/60 px-4 py-1.5 text-xs font-semibold tracking-wider text-pink-600 uppercase shadow-sm backdrop-blur dark:border-pink-800 dark:bg-gray-800/60 dark:text-pink-300">
                 Erreur 404
             </span>
 
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-6 drop-shadow-lg">
+            <span className="mb-8 inline-flex h-20 w-20 items-center justify-center rounded-2xl bg-linear-to-br from-pink-500 to-purple-500 text-white shadow-lg shadow-pink-500/25">
+                <Block fontSize="large" />
+            </span>
+
+            <h1 className="mb-5 max-w-2xl text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl dark:text-white">
                 Page introuvable
             </h1>
 
-            <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mb-10 leading-relaxed">
+            <p className="mb-10 max-w-2xl text-lg leading-relaxed text-gray-600 sm:text-xl dark:text-gray-300">
                 Oups... la page que vous cherchez semble avoir disparu 🫥 <br />
-                Vérifiez l’URL ou revenez à une page connue.
+                Vérifiez l'URL ou revenez à une page connue.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-6 justify-center">
+            <div className="flex flex-col items-center gap-4 sm:flex-row">
                 <Button
                     variant="contained"
                     size="large"
                     startIcon={<ArrowBackIcon />}
                     onClick={() => navigate(-1)}
-                    className="bg-linear-to-r from-cyan-500 to-purple-500 hover:from-purple-500 hover:to-cyan-500 text-white shadow-lg transition-all transform hover:-translate-y-1"
+                    className="bg-linear-to-r from-pink-500 to-purple-500 text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:from-purple-500 hover:to-pink-500"
                 >
                     Retour
                 </Button>
@@ -278,7 +290,7 @@ export default function NotFound() {
                         variant="outlined"
                         size="large"
                         startIcon={<Home />}
-                        className="text-purple-600 dark:text-purple-300 border border-purple-600 dark:border-purple-300 hover:bg-purple-50 dark:hover:bg-purple-700 dark:hover:text-white shadow-md transition-all transform hover:-translate-y-1"
+                        className="border-purple-300 text-purple-600 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-purple-50 dark:border-purple-700 dark:text-purple-300 dark:hover:bg-purple-900/50"
                     >
                         Accueil
                     </Button>
@@ -301,38 +313,47 @@ export default function DefaultLayout() {
 }
 '@
 
-$react_vite_mui_project_toggle_mode_content = @'
+$react_vite_mui_project_toogle_mode_content = @'
 import { UseThemeMode } from '@/theme/ThemeContext';
-import { FormControl, MenuItem, Select, type SelectChangeEvent } from '@mui/material';
+import { Box, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import SunnyIcon from '@mui/icons-material/Sunny';
 import BedtimeIcon from '@mui/icons-material/Bedtime';
 import LaptopWindowsIcon from '@mui/icons-material/LaptopWindows';
 
+const OPTIONS = [
+    { value: 'system', label: 'System', Icon: LaptopWindowsIcon },
+    { value: 'light', label: 'Light', Icon: SunnyIcon },
+    { value: 'dark', label: 'Dark', Icon: BedtimeIcon },
+] as const;
+
 export default function ToggleMode({ className }: { className?: string }) {
     const { mode, setMode } = UseThemeMode();
 
-    const handleChange = (event: SelectChangeEvent) => {
-        setMode(event.target.value as 'light' | 'dark' | 'system');
-    };
+    const current = OPTIONS.find((o) => o.value === mode) ?? OPTIONS[0];
+    const CurrentIcon = current.Icon;
 
     return (
-        <FormControl variant="outlined" size="small" className={ className }>
+        <FormControl size="small" className={className} sx={{ minWidth: 130 }}>
+            <InputLabel id="theme-select-label">Theme</InputLabel>
             <Select
                 labelId="theme-select-label"
+                label="Theme"
                 value={mode}
-                onChange={handleChange}
-                className="bg-white dark:bg-gray-800 text-black dark:text-white"
-                sx={{ minWidth: 130 }}
+                onChange={(e) => setMode(e.target.value as 'light' | 'dark' | 'system')}
+                renderValue={() => (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <CurrentIcon fontSize="small" />
+                        <span style={{ textTransform: 'capitalize' }}>{current.label}</span>
+                    </Box>
+                )}
+                MenuProps={{ slotProps: { paper: { style: { borderRadius: 12, marginTop: 4 } } } }}
             >
-                <MenuItem value="light">
-                    <SunnyIcon className="mr-1" /> Light
-                </MenuItem>
-                <MenuItem value="dark">
-                    <BedtimeIcon className="mr-1" /> Dark
-                </MenuItem>
-                <MenuItem value="system">
-                    <LaptopWindowsIcon className="mr-1" /> System
-                </MenuItem>
+                {OPTIONS.map(({ value, label, Icon }) => (
+                    <MenuItem key={value} value={value}>
+                        <Icon sx={{ mr: 1 }} fontSize="small" />
+                        {label}
+                    </MenuItem>
+                ))}
             </Select>
         </FormControl>
     );
@@ -344,8 +365,8 @@ function New-ReactViteMaterialUi {
 
     if (-not $PROJECT_NAME) { $PROJECT_NAME = Read-Host "Project name" }
 
-    Write-Host "Creating project: $PROJECT_NAME (Vite + React 18 + MUI + TypeScript)"
-    Write-Output n | npx create-vite@latest "$PROJECT_NAME" --template react-ts
+    Write-Host "Creating project: $PROJECT_NAME (Vite + React 19 + MUI + TypeScript)"
+    npx create-vite@latest "$PROJECT_NAME" --template react-ts
 
     Set-Location "$PROJECT_NAME"
 
@@ -381,7 +402,7 @@ function New-ReactViteMaterialUi {
     Set-Content "src/pages/Home.tsx" -Value $react_vite_mui_project_home_page_content -Encoding UTF8
     Set-Content "src/pages/NotFound.tsx" -Value $react_vite_mui_project_not_found_page_content -Encoding UTF8
     Set-Content "src/layouts/default.tsx" -Value $react_vite_mui_project_default_layout_content -Encoding UTF8
-    Set-Content "src/components/ToggleMode.tsx" -Value $react_vite_mui_project_toggle_mode_content -Encoding UTF8
+    Set-Content "src/components/ToggleMode.tsx" -Value $react_vite_mui_project_toogle_mode_content -Encoding UTF8
 
     if ($PRETTIE.Trim() -match '^[Yy]') {
         npm run format

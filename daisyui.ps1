@@ -1,4 +1,4 @@
-$react_vite_shadecn_project_config_content = @'
+$react_vite_daisy_project_config_content = @'
 import { defineConfig } from 'vite';
 import { fileURLToPath, URL } from 'node:url';
 import react from '@vitejs/plugin-react';
@@ -20,19 +20,7 @@ export default defineConfig({
 });
 '@
 
-$react_vite_shadecn_project_tsconfig_content = @'
-{
-    "files": [],
-    "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }],
-    "compilerOptions": {
-        "paths": {
-            "@/*": ["./src/*"]
-        }
-    }
-}
-'@
-
-$react_vite_shadecn_project_tsconfig_app_content = @'
+$react_vite_daisy_project_tsconfig_app_content = @'
 {
     "compilerOptions": {
         "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
@@ -68,7 +56,7 @@ $react_vite_shadecn_project_tsconfig_app_content = @'
 }
 '@
 
-$react_vite_shadecn_project_main_content = @'
+$react_vite_daisy_project_main_content = @'
 import '@/styles/index.css';
 
 import { StrictMode } from 'react';
@@ -86,7 +74,7 @@ createRoot(document.getElementById('root')!).render(
 );
 '@
 
-$react_vite_shadecn_project_theme_content = @'
+$react_vite_daisy_project_theme_content = @'
 import { createContext, type ReactNode, useContext, useEffect, useState } from 'react';
 
 type Theme = 'dark' | 'light' | 'system';
@@ -124,16 +112,13 @@ export function ThemeProvider({
 
         root.classList.remove('light', 'dark');
 
-        if (theme === 'system') {
-            const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
-                ? 'dark'
-                : 'light';
+        const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? 'dark'
+            : 'light';
+        const resolved = theme === 'system' ? systemTheme : theme;
 
-            root.classList.add(systemTheme);
-            return;
-        }
-
-        root.classList.add(theme);
+        root.classList.add(resolved);
+        root.setAttribute('data-theme', resolved);
     }, [theme]);
 
     useEffect(() => {
@@ -142,8 +127,10 @@ export function ThemeProvider({
         const media = window.matchMedia('(prefers-color-scheme: dark)');
         const onChange = () => {
             const root = window.document.documentElement;
+            const next = media.matches ? 'dark' : 'light';
             root.classList.remove('light', 'dark');
-            root.classList.add(media.matches ? 'dark' : 'light');
+            root.classList.add(next);
+            root.setAttribute('data-theme', next);
         };
 
         media.addEventListener('change', onChange);
@@ -174,13 +161,14 @@ export const UseTheme = () => {
 };
 '@
 
-$react_vite_shadecn_project_style_content = @'
+$react_vite_daisy_project_style_content = @'
 @import 'tailwindcss';
+@plugin 'daisyui';
 
 @custom-variant dark (&:is(.dark *));
 '@
 
-$react_vite_shadecn_project_route_content = @'
+$react_vite_daisy_project_route_content = @'
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import DefaultLayout from '@/layouts/default';
 import Home from '@/pages/Home';
@@ -202,9 +190,8 @@ const router = createBrowserRouter([
 export default router;
 '@
 
-$react_vite_shadecn_project_home_page_content = @'
-import { ToggleMode } from '@/components/ToggleMode';
-import { Button } from '@/components/ui/button';
+$react_vite_daisy_project_home_page_content = @'
+import ToggleMode from '@/components/ToggleMode';
 import { BookOpen, HomeIcon, Rocket } from 'lucide-react';
 
 export default function Home() {
@@ -213,12 +200,12 @@ export default function Home() {
             <div className="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-cyan-400/20 blur-3xl" />
             <div className="pointer-events-none absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-purple-500/20 blur-3xl" />
 
-            <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-200/60 bg-white/60 px-4 py-1.5 text-xs font-semibold tracking-wider text-cyan-700 uppercase shadow-sm backdrop-blur dark:border-cyan-800 dark:bg-gray-800/60 dark:text-cyan-300">
+            <span className="badge badge-outline mb-6 gap-2 rounded-full border-cyan-200/70 px-4 py-3 text-xs font-semibold tracking-wider text-cyan-700 uppercase shadow-sm backdrop-blur dark:border-cyan-800 dark:text-cyan-300">
                 <span className="relative flex h-2 w-2">
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75" />
                     <span className="relative inline-flex h-2 w-2 rounded-full bg-cyan-500" />
                 </span>
-                React 19 • Shadcn UI
+                React 19 • DaisyUI
             </span>
 
             <span className="mb-8 inline-flex h-20 w-20 items-center justify-center rounded-2xl bg-linear-to-br from-cyan-500 to-purple-500 text-white shadow-lg shadow-cyan-500/25">
@@ -231,7 +218,7 @@ export default function Home() {
 
             <p className="mb-10 max-w-2xl text-lg leading-relaxed text-gray-600 sm:text-xl dark:text-gray-300">
                 Ce projet est pré-configuré avec{' '}
-                <span className="font-semibold text-cyan-600 dark:text-cyan-400"> Shadcn UI</span>,
+                <span className="font-semibold text-cyan-600 dark:text-cyan-400"> DaisyUI</span>,
                 <span className="font-semibold text-purple-600 dark:text-purple-400"> TailwindCSS</span>{' '}
                 et
                 <span className="font-semibold text-pink-600 dark:text-pink-400">
@@ -242,22 +229,21 @@ export default function Home() {
             </p>
 
             <div className="flex flex-col items-center gap-4 sm:flex-row">
-                <Button
-                    size="lg"
-                    className="w-full cursor-pointer bg-linear-to-r from-cyan-500 to-purple-500 text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:from-purple-500 hover:to-cyan-500 sm:w-auto"
+                <button
+                    type="button"
+                    className="btn btn-lg btn-primary border-0 bg-linear-to-r from-cyan-500 to-purple-500 text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:from-purple-500 hover:to-cyan-500"
                 >
                     <Rocket size={20} />
                     Démarrer
-                </Button>
+                </button>
 
-                <Button
-                    variant="outline"
-                    size="lg"
-                    className="w-full cursor-pointer border-purple-300 text-purple-600 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-purple-50 sm:w-auto dark:border-purple-700 dark:text-purple-300 dark:hover:bg-purple-900/50"
+                <button
+                    type="button"
+                    className="btn btn-lg btn-outline border-purple-300 text-purple-600 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-purple-400 hover:bg-purple-50 dark:border-purple-700 dark:text-purple-300 dark:hover:bg-purple-900/50"
                 >
                     <BookOpen size={20} />
                     Documentation
-                </Button>
+                </button>
             </div>
 
             <ToggleMode className="fixed top-5 right-5 z-50" />
@@ -266,8 +252,8 @@ export default function Home() {
 }
 '@
 
-$react_vite_shadecn_project_not_found_page_content = @'
-import { Button } from '@/components/ui/button';
+$react_vite_daisy_project_not_found_page_content = @'
+import ToggleMode from '@/components/ToggleMode';
 import { ArrowLeft, Ban, HomeIcon } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -279,7 +265,7 @@ export default function NotFound() {
             <div className="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-pink-400/20 blur-3xl" />
             <div className="pointer-events-none absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-purple-500/20 blur-3xl" />
 
-            <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-pink-200/60 bg-white/60 px-4 py-1.5 text-xs font-semibold tracking-wider text-pink-600 uppercase shadow-sm backdrop-blur dark:border-pink-800 dark:bg-gray-800/60 dark:text-pink-300">
+            <span className="badge badge-outline mb-6 gap-2 rounded-full border-pink-200/70 px-4 py-3 text-xs font-semibold tracking-wider text-pink-600 uppercase shadow-sm backdrop-blur dark:border-pink-800 dark:text-pink-300">
                 Erreur 404
             </span>
 
@@ -297,24 +283,23 @@ export default function NotFound() {
             </p>
 
             <div className="flex flex-col items-center gap-4 sm:flex-row">
-                <Button
-                    size="lg"
+                <button
+                    type="button"
                     onClick={() => navigate(-1)}
-                    className="w-full cursor-pointer bg-linear-to-r from-pink-500 to-purple-500 text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:from-purple-500 hover:to-pink-500 sm:w-auto"
+                    className="btn btn-lg btn-primary border-0 bg-linear-to-r from-pink-500 to-purple-500 text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:from-purple-500 hover:to-pink-500"
                 >
                     <ArrowLeft size={20} />
                     Retour
-                </Button>
+                </button>
 
                 <Link to="/">
-                    <Button
-                        variant="outline"
-                        size="lg"
-                        className="w-full cursor-pointer border-purple-300 text-purple-600 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-purple-50 sm:w-auto dark:border-purple-700 dark:text-purple-300 dark:hover:bg-purple-900/50"
+                    <button
+                        type="button"
+                        className="btn btn-lg btn-outline border-purple-300 text-purple-600 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-purple-400 hover:bg-purple-50 dark:border-purple-700 dark:text-purple-300 dark:hover:bg-purple-900/50"
                     >
                         <HomeIcon size={20} />
                         Accueil
-                    </Button>
+                    </button>
                 </Link>
             </div>
 
@@ -326,7 +311,7 @@ export default function NotFound() {
 }
 '@
 
-$react_vite_shadecn_project_default_layout_content = @'
+$react_vite_daisy_project_default_layout_content = @'
 import { Outlet } from 'react-router-dom';
 
 export default function DefaultLayout() {
@@ -334,65 +319,53 @@ export default function DefaultLayout() {
 }
 '@
 
-$react_vite_shadecn_project_toogle_mode_content = @'
-import { Check, Monitor, Moon, Sun } from 'lucide-react';
+$react_vite_daisy_project_toogle_mode_content = @'
+import { UseTheme, type Theme } from '@/theme/ThemeProvider';
+import { Monitor, Moon, Sun } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { UseTheme } from '@/theme/ThemeProvider';
-
-const OPTIONS = [
+const OPTIONS: { value: Theme; label: string; Icon: typeof Sun }[] = [
     { value: 'light', label: 'Light', Icon: Sun },
     { value: 'dark', label: 'Dark', Icon: Moon },
     { value: 'system', label: 'System', Icon: Monitor },
-] as const;
+];
 
-export function ToggleMode({ className }: { className?: string }) {
+export default function ToggleMode({ className }: { className?: string }) {
     const { theme, setTheme } = UseTheme();
-
-    const CurrentIcon = OPTIONS.find((o) => o.value === theme)?.Icon ?? Monitor;
 
     return (
         <div className={className}>
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="icon" aria-label="Changer de thème">
-                        <CurrentIcon size={22} />
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="min-w-[10rem]">
-                    {OPTIONS.map(({ value, label, Icon }) => (
-                        <DropdownMenuItem key={value} onClick={() => setTheme(value)}>
-                            <Icon size={18} className="mr-2 h-4 w-4" />
-                            <span>{label}</span>
-                            {theme === value && <Check size={18} className="ml-auto h-4 w-4" />}
-                        </DropdownMenuItem>
-                    ))}
-                </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="join shadow-lg">
+                {OPTIONS.map(({ value, label, Icon }) => (
+                    <button
+                        key={value}
+                        type="button"
+                        aria-label={label}
+                        title={label}
+                        onClick={() => setTheme(value)}
+                        className={`join-item btn btn-sm ${theme === value ? 'btn-primary' : 'btn-ghost'}`}
+                    >
+                        <Icon size={18} />
+                    </button>
+                ))}
+            </div>
         </div>
     );
 }
 '@
 
-function New-ReactViteShadecnUi {
+function New-ReactViteDaisyUi {
     param([string]$PROJECT_NAME)
 
     if (-not $PROJECT_NAME) { $PROJECT_NAME = Read-Host "Project name" }
 
-    Write-Host "Creating project: $PROJECT_NAME (Vite + React 19 + Shadcn UI + TypeScript)"
+    Write-Host "Creating project: $PROJECT_NAME (Vite + React 19 + DaisyUI + TypeScript)"
     npx create-vite@latest "$PROJECT_NAME" --template react-ts
 
     Set-Location "$PROJECT_NAME"
 
     Clear-Host
     Write-Host "Installing dependencies..."
-    npm install react-router-dom tailwindcss @tailwindcss/vite
+    npm install react-router-dom tailwindcss @tailwindcss/vite daisyui lucide-react
 
     $PRETTIE = Read-Host "Would you like to install Prettier? (Y/N)"
     if ($PRETTIE.Trim() -match '^[Yy]') {
@@ -400,6 +373,7 @@ function New-ReactViteShadecnUi {
     }
 
     Remove-Item "src/App.css" -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item "src/index.css" -Recurse -Force -ErrorAction SilentlyContinue
     Remove-Item "src/App.tsx" -Recurse -Force -ErrorAction SilentlyContinue
 
     $dirs = @(
@@ -412,24 +386,16 @@ function New-ReactViteShadecnUi {
     )
     foreach ($d in $dirs) { if (-not (Test-Path $d)) { New-Item -ItemType Directory -Path $d -Force | Out-Null } }
 
-    Set-Content "vite.config.ts" -Value $react_vite_shadecn_project_config_content -Encoding UTF8
-    Set-Content "tsconfig.json" -Value $react_vite_shadecn_project_tsconfig_content -Encoding UTF8
-    Set-Content "tsconfig.app.json" -Value $react_vite_shadecn_project_tsconfig_app_content -Encoding UTF8
-
-    Write-Host "Initializing Shadcn UI..."
-    npx shadcn@latest init -y -b neutral -f
-    npx shadcn@latest add button dropdown-menu -y
-
-    Move-Item "src/index.css" "src/styles/index.css" -Force -ErrorAction SilentlyContinue
-
-    Set-Content "vite.config.ts" -Value $react_vite_shadecn_project_config_content -Encoding UTF8
-    Set-Content "src/main.tsx" -Value $react_vite_shadecn_project_main_content -Encoding UTF8
-    Set-Content "src/theme/ThemeProvider.tsx" -Value $react_vite_shadecn_project_theme_content -Encoding UTF8
-    Set-Content "src/routes/index.tsx" -Value $react_vite_shadecn_project_route_content -Encoding UTF8
-    Set-Content "src/pages/Home.tsx" -Value $react_vite_shadecn_project_home_page_content -Encoding UTF8
-    Set-Content "src/pages/NotFound.tsx" -Value $react_vite_shadecn_project_not_found_page_content -Encoding UTF8
-    Set-Content "src/layouts/default.tsx" -Value $react_vite_shadecn_project_default_layout_content -Encoding UTF8
-    Set-Content "src/components/ToggleMode.tsx" -Value $react_vite_shadecn_project_toogle_mode_content -Encoding UTF8
+    Set-Content "vite.config.ts" -Value $react_vite_daisy_project_config_content -Encoding UTF8
+    Set-Content "tsconfig.app.json" -Value $react_vite_daisy_project_tsconfig_app_content -Encoding UTF8
+    Set-Content "src/styles/index.css" -Value $react_vite_daisy_project_style_content -Encoding UTF8
+    Set-Content "src/main.tsx" -Value $react_vite_daisy_project_main_content -Encoding UTF8
+    Set-Content "src/theme/ThemeProvider.tsx" -Value $react_vite_daisy_project_theme_content -Encoding UTF8
+    Set-Content "src/routes/index.tsx" -Value $react_vite_daisy_project_route_content -Encoding UTF8
+    Set-Content "src/pages/Home.tsx" -Value $react_vite_daisy_project_home_page_content -Encoding UTF8
+    Set-Content "src/pages/NotFound.tsx" -Value $react_vite_daisy_project_not_found_page_content -Encoding UTF8
+    Set-Content "src/layouts/default.tsx" -Value $react_vite_daisy_project_default_layout_content -Encoding UTF8
+    Set-Content "src/components/ToggleMode.tsx" -Value $react_vite_daisy_project_toogle_mode_content -Encoding UTF8
 
     if ($PRETTIE.Trim() -match '^[Yy]') {
         npm run format

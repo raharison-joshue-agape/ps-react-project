@@ -1,6 +1,6 @@
 $react_vite_heroui_project_config_content = @'
 import { defineConfig } from 'vite';
-import path from 'path';
+import { fileURLToPath, URL } from 'node:url';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 
@@ -8,13 +8,13 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
     server: {
         port: 5173,
-        host: '::',
+        host: '0.0.0.0',
+        open: true,
     },
     plugins: [react(), tailwindcss()],
     resolve: {
-        tsconfigPaths: true,
         alias: {
-            '@': path.resolve(__dirname, 'src'),
+            '@': fileURLToPath(new URL('./src', import.meta.url)),
         },
     },
 });
@@ -24,9 +24,10 @@ $react_vite_heroui_project_tsconfig_app_content = @'
 {
     "compilerOptions": {
         "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
-        "target": "es2023",
-        "lib": ["ES2023", "DOM", "DOM.Iterable"],
-        "module": "esnext",
+        "target": "ES2022",
+        "useDefineForClassFields": true,
+        "lib": ["ES2022", "DOM", "DOM.Iterable"],
+        "module": "ESNext",
         "types": ["vite/client"],
         "skipLibCheck": true,
 
@@ -39,17 +40,17 @@ $react_vite_heroui_project_tsconfig_app_content = @'
         "jsx": "react-jsx",
 
         /* Linting */
+        "strict": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "erasableSyntaxOnly": true,
         "noFallthroughCasesInSwitch": true,
+        "noUncheckedSideEffectImports": true,
 
         /* Alias @ = src */
-        "baseUrl": ".",
         "paths": {
-            "@/*": ["src/*"]
-        },
-        "ignoreDeprecations": "6.0"
+            "@/*": ["./src/*"]
+        }
     },
     "include": ["src"]
 }
@@ -74,12 +75,12 @@ createRoot(document.getElementById('root')!).render(
 '@
 
 $react_vite_heroui_project_theme_content = @'
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, type ReactNode, useContext, useEffect, useState } from 'react';
 
 type Theme = 'dark' | 'light' | 'system';
 
 type ThemeProviderProps = {
-    children: React.ReactNode;
+    children: ReactNode;
     defaultTheme?: Theme;
     storageKey?: string;
 };
@@ -121,6 +122,20 @@ export function ThemeProvider({
         }
 
         root.classList.add(theme);
+    }, [theme]);
+
+    useEffect(() => {
+        if (theme !== 'system') return;
+
+        const media = window.matchMedia('(prefers-color-scheme: dark)');
+        const onChange = () => {
+            const root = window.document.documentElement;
+            root.classList.remove('light', 'dark');
+            root.classList.add(media.matches ? 'dark' : 'light');
+        };
+
+        media.addEventListener('change', onChange);
+        return () => media.removeEventListener('change', onChange);
     }, [theme]);
 
     const value = {
@@ -180,101 +195,120 @@ export default router;
 $react_vite_heroui_project_home_page_content = @'
 import ToggleMode from '@/components/ToggleMode';
 import { Button } from '@heroui/react';
-import { HomeIcon } from 'lucide-react';
+import { BookOpen, HomeIcon, Rocket } from 'lucide-react';
 
 export default function Home() {
     return (
-        <main className="min-h-screen flex flex-col items-center justify-center px-6 text-center bg-linear-to-br from-cyan-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors">
-            <HomeIcon size={50} className="text-cyan-600 dark:text-cyan-400 mb-6 animate-bounce" />
+        <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 py-16 text-center bg-linear-to-br from-slate-50 via-white to-indigo-50 transition-colors dark:from-gray-950 dark:via-gray-900 dark:to-indigo-950">
+            <div className="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-cyan-400/20 blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-purple-500/20 blur-3xl" />
 
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-8 drop-shadow-lg">
+            <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-200/60 bg-white/60 px-4 py-1.5 text-xs font-semibold tracking-wider text-cyan-700 uppercase shadow-sm backdrop-blur dark:border-cyan-800 dark:bg-gray-800/60 dark:text-cyan-300">
+                <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-cyan-500" />
+                </span>
+                React 19 • Hero UI
+            </span>
+
+            <span className="mb-8 inline-flex h-20 w-20 items-center justify-center rounded-2xl bg-linear-to-br from-cyan-500 to-purple-500 text-white shadow-lg shadow-cyan-500/25">
+                <HomeIcon size={40} />
+            </span>
+
+            <h1 className="mb-5 max-w-2xl text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl dark:text-white">
                 Bienvenue sur votre projet React
             </h1>
 
-            <p className="text-lg sm:text-xl md:text-2xl text-gray-600 dark:text-gray-300 max-w-2xl mb-10 leading-relaxed">
+            <p className="mb-10 max-w-2xl text-lg leading-relaxed text-gray-600 sm:text-xl dark:text-gray-300">
                 Ce projet est pré-configuré avec{' '}
                 <span className="font-semibold text-cyan-600 dark:text-cyan-400"> Hero UI</span>,
-                <span className="font-semibold text-purple-600 dark:text-purple-300">
-                    {' '}
-                    TailwindCSS
-                </span>{' '}
+                <span className="font-semibold text-purple-600 dark:text-purple-400"> TailwindCSS</span>{' '}
                 et
-                <span className="font-semibold text-pink-600 dark:text-pink-300">
+                <span className="font-semibold text-pink-600 dark:text-pink-400">
                     {' '}
                     Lucide Icons{' '}
                 </span>
                 pour un développement rapide et élégant.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-6 justify-center">
+            <div className="flex flex-col items-center gap-4 sm:flex-row">
                 <Button
-                    variant="secondary"
+                    color="primary"
                     size="lg"
-                    className="bg-linear-to-r from-cyan-500 to-purple-500 hover:from-purple-500 hover:to-cyan-500 text-white shadow-lg transition-all transform hover:-translate-y-1"
+                    startContent={<Rocket size={20} />}
+                    className="bg-linear-to-r from-cyan-500 to-purple-500 text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:from-purple-500 hover:to-cyan-500"
                 >
-                    <HomeIcon /> Démarrer
+                    Démarrer
                 </Button>
 
                 <Button
-                    variant="outline"
+                    variant="bordered"
+                    color="secondary"
                     size="lg"
-                    className="text-purple-600 dark:text-purple-300 border border-purple-600 dark:border-purple-300 hover:bg-purple-50 dark:hover:bg-purple-700 dark:hover:text-white shadow-md transition-all transform hover:-translate-y-1"
+                    startContent={<BookOpen size={20} />}
+                    className="border-purple-300 text-purple-600 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-purple-50 dark:border-purple-700 dark:text-purple-300 dark:hover:bg-purple-900/50"
                 >
                     Documentation
                 </Button>
             </div>
 
-            <ToggleMode className="fixed top-4 right-5" />
+            <ToggleMode className="fixed top-5 right-5 z-50" />
         </main>
     );
 }
 '@
 
 $react_vite_heroui_project_not_found_page_content = @'
+import ToggleMode from '@/components/ToggleMode';
 import { Button } from '@heroui/react';
-import { ArrowLeft, BanIcon, HomeIcon } from 'lucide-react';
+import { ArrowLeft, Ban, HomeIcon } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 export default function NotFound() {
     const navigate = useNavigate();
 
     return (
-        <main className="min-h-screen flex flex-col items-center justify-center px-6 text-center bg-linear-to-br from-cyan-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors">
-            <BanIcon
-                size={50}
-                className="text-pink-600 dark:text-pink-400 text-7xl mb-6 animate-pulse"
-            />
+        <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 py-16 text-center bg-linear-to-br from-slate-50 via-white to-indigo-50 transition-colors dark:from-gray-950 dark:via-gray-900 dark:to-indigo-950">
+            <div className="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-pink-400/20 blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-purple-500/20 blur-3xl" />
 
-            <span className="text-sm font-semibold px-4 py-1 rounded-full bg-pink-100 text-pink-600 dark:bg-pink-900 dark:text-pink-300 mb-4 shadow">
+            <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-pink-200/60 bg-white/60 px-4 py-1.5 text-xs font-semibold tracking-wider text-pink-600 uppercase shadow-sm backdrop-blur dark:border-pink-800 dark:bg-gray-800/60 dark:text-pink-300">
                 Erreur 404
             </span>
 
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-6 drop-shadow-lg">
+            <span className="mb-8 inline-flex h-20 w-20 items-center justify-center rounded-2xl bg-linear-to-br from-pink-500 to-purple-500 text-white shadow-lg shadow-pink-500/25">
+                <Ban size={40} />
+            </span>
+
+            <h1 className="mb-5 max-w-2xl text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl dark:text-white">
                 Page introuvable
             </h1>
 
-            <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mb-10 leading-relaxed">
+            <p className="mb-10 max-w-2xl text-lg leading-relaxed text-gray-600 sm:text-xl dark:text-gray-300">
                 Oups... la page que vous cherchez semble avoir disparu 🫥 <br />
-                Vérifiez l’URL ou revenez à une page connue.
+                Vérifiez l'URL ou revenez à une page connue.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-6 justify-center">
+            <div className="flex flex-col items-center gap-4 sm:flex-row">
                 <Button
-                    variant="secondary"
+                    color="primary"
                     size="lg"
+                    startContent={<ArrowLeft size={20} />}
                     onClick={() => navigate(-1)}
-                    className="bg-linear-to-r from-cyan-500 to-purple-500 hover:from-purple-500 hover:to-cyan-500 text-white shadow-lg transition-all transform hover:-translate-y-1 cursor-pointer"
+                    className="bg-linear-to-r from-pink-500 to-purple-500 text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:from-purple-500 hover:to-pink-500"
                 >
-                    <ArrowLeft /> Retour
+                    Retour
                 </Button>
 
                 <Link to="/">
                     <Button
-                        variant="outline"
+                        variant="bordered"
+                        color="secondary"
                         size="lg"
-                        className="text-purple-600 dark:text-purple-300 border border-purple-600 dark:border-purple-300 hover:bg-purple-50 dark:hover:bg-purple-700 dark:hover:text-white shadow-md transition-all transform hover:-translate-y-1 cursor-pointer"
+                        startContent={<HomeIcon size={20} />}
+                        className="border-purple-300 text-purple-600 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-purple-50 dark:border-purple-700 dark:text-purple-300 dark:hover:bg-purple-900/50"
                     >
-                        <HomeIcon /> Accueil
+                        Accueil
                     </Button>
                 </Link>
             </div>
@@ -300,42 +334,43 @@ import { UseTheme } from '@/theme/ThemeProvider';
 import { ListBox, Select } from '@heroui/react';
 import { Monitor, Moon, Sun } from 'lucide-react';
 
+const OPTIONS = [
+    { value: 'system', label: 'System', Icon: Monitor },
+    { value: 'light', label: 'Light', Icon: Sun },
+    { value: 'dark', label: 'Dark', Icon: Moon },
+] as const;
+
 export default function ToggleMode({ className }: { className?: string }) {
     const { theme, setTheme } = UseTheme();
 
+    const CurrentIcon = OPTIONS.find((o) => o.value === theme)?.Icon ?? Monitor;
+
     return (
         <Select
-            className={className}
+            aria-label="Changer de thème"
+            className={`w-44 ${className ?? ''}`}
             selectedKey={theme}
             onSelectionChange={(key) => setTheme(key as 'dark' | 'light' | 'system')}
         >
             <Select.Trigger>
-                <Select.Value />
+                <div className="flex items-center gap-2">
+                    <CurrentIcon size={18} />
+                    <Select.Value />
+                </div>
                 <Select.Indicator />
             </Select.Trigger>
 
             <Select.Popover>
                 <ListBox>
-                    <ListBox.Item id="system" textValue="System">
-                        <div className="flex items-center gap-2">
-                            <Monitor size={20} /> System
-                        </div>
-                        <ListBox.ItemIndicator />
-                    </ListBox.Item>
-
-                    <ListBox.Item id="light" textValue="Light">
-                        <div className="flex items-center gap-2">
-                            <Sun size={20} /> Light
-                        </div>
-                        <ListBox.ItemIndicator />
-                    </ListBox.Item>
-
-                    <ListBox.Item id="dark" textValue="Dark">
-                        <div className="flex items-center gap-2">
-                            <Moon size={20} /> Dark
-                        </div>
-                        <ListBox.ItemIndicator />
-                    </ListBox.Item>
+                    {OPTIONS.map(({ value, label, Icon }) => (
+                        <ListBox.Item key={value} id={value} textValue={label}>
+                            <div className="flex items-center gap-2">
+                                <Icon size={20} />
+                                <span>{label}</span>
+                            </div>
+                            <ListBox.ItemIndicator />
+                        </ListBox.Item>
+                    ))}
                 </ListBox>
             </Select.Popover>
         </Select>
@@ -348,14 +383,14 @@ function New-ReactViteHeroUi {
 
     if (-not $PROJECT_NAME) { $PROJECT_NAME = Read-Host "Project name" }
 
-    Write-Host "Creating project: $PROJECT_NAME (Vite + React 18 + Hero UI + TypeScript)"
-    Write-Output n | npx create-vite@latest "$PROJECT_NAME" --template react-ts
+    Write-Host "Creating project: $PROJECT_NAME (Vite + React 19 + Hero UI + TypeScript)"
+    npx create-vite@latest "$PROJECT_NAME" --template react-ts
 
     Set-Location "$PROJECT_NAME"
 
     Clear-Host
     Write-Host "Installing dependencies..."
-    npm install @heroui/styles @heroui/react react-router-dom tailwindcss @tailwindcss/vite lucide-react@next
+    npm install @heroui/styles @heroui/react react-router-dom tailwindcss @tailwindcss/vite lucide-react
 
     $PRETTIE = Read-Host "Would you like to install Prettier? (Y/N)"
     if ($PRETTIE.Trim() -match '^[Yy]') {

@@ -1,19 +1,19 @@
 $react_vite_chakra_project_config_content = @'
 import { defineConfig } from 'vite';
-import path from 'path';
+import { fileURLToPath, URL } from 'node:url';
 import react from '@vitejs/plugin-react';
 
 // https://vite.dev/config/
 export default defineConfig({
     server: {
         port: 5173,
-        host: '::',
+        host: '0.0.0.0',
+        open: true,
     },
     plugins: [react()],
     resolve: {
-        tsconfigPaths: true,
         alias: {
-            '@': path.resolve(__dirname, 'src'),
+            '@': fileURLToPath(new URL('./src', import.meta.url)),
         },
     },
 });
@@ -23,9 +23,10 @@ $react_vite_chakra_project_tsconfig_app_content = @'
 {
     "compilerOptions": {
         "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
-        "target": "es2023",
-        "lib": ["ES2023", "DOM", "DOM.Iterable"],
-        "module": "esnext",
+        "target": "ES2022",
+        "useDefineForClassFields": true,
+        "lib": ["ES2022", "DOM", "DOM.Iterable"],
+        "module": "ESNext",
         "types": ["vite/client"],
         "skipLibCheck": true,
 
@@ -38,11 +39,14 @@ $react_vite_chakra_project_tsconfig_app_content = @'
         "jsx": "react-jsx",
 
         /* Linting */
+        "strict": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "erasableSyntaxOnly": true,
         "noFallthroughCasesInSwitch": true,
+        "noUncheckedSideEffectImports": true,
 
+        /* Alias @ = src */
         "paths": {
             "@/*": ["./src/*"]
         }
@@ -74,6 +78,9 @@ createRoot(document.getElementById('root')!).render(
 
 $react_vite_chakra_project_style_content = @'
 /* Global css styles */
+html {
+    scroll-behavior: smooth;
+}
 '@
 
 $react_vite_chakra_project_route_content = @'
@@ -99,99 +106,165 @@ export default router;
 '@
 
 $react_vite_chakra_project_home_page_content = @'
-import { HomeIcon } from 'lucide-react';
+import ToggleMode from '@/components/ToggleMode';
 import { Box, Button, Flex, Icon, Text } from '@chakra-ui/react';
-import { ColorModeButton } from '@/components/ui/color-mode';
+import { HomeIcon } from 'lucide-react';
 
 export default function Home() {
     return (
         <Box
+            position="relative"
             minHeight="100vh"
-            border={1}
-            borderColor="red.500"
+            overflow="hidden"
             display="flex"
             flexDirection="column"
             alignItems="center"
             justifyContent="center"
             paddingInline="6"
+            paddingY="16"
             textAlign="center"
             transition="colors"
             bgGradient={{
-                base: 'linear(to-br, cyan.50, purple.50, pink.50)',
-                _dark: 'linear(to-br, gray.900, gray.800, gray.900)',
+                base: 'linear(to-br, slate.50, white, indigo.50)',
+                _dark: 'linear(to-br, gray.950, gray.900, indigo.950)',
             }}
         >
-            <Icon
-                color={{ base: 'teal.600', _dark: 'teal.400' }}
-                animation="bounce"
-                marginBottom="6"
+            <Box
+                position="absolute"
+                top="-6rem"
+                left="-6rem"
+                width="18rem"
+                height="18rem"
+                bg="cyan.400"
+                opacity="0.15"
+                borderRadius="full"
+                filter="blur(3rem)"
+                pointerEvents="none"
+            />
+            <Box
+                position="absolute"
+                bottom="-6rem"
+                right="-6rem"
+                width="18rem"
+                height="18rem"
+                bg="purple.500"
+                opacity="0.15"
+                borderRadius="full"
+                filter="blur(3rem)"
+                pointerEvents="none"
+            />
+
+            <Flex
+                alignItems="center"
+                gap="2"
+                mb="6"
+                px="4"
+                py="1.5"
+                borderRadius="full"
+                borderWidth="1px"
+                borderColor="cyan.200"
+                bg="whiteAlpha.700"
+                backdropFilter="blur(8px)"
+                boxShadow="sm"
+                _dark={{ borderColor: 'cyan.800', bg: 'gray.800' }}
             >
-                <HomeIcon size={50} />
-            </Icon>
+                <Box width="2" height="2" borderRadius="full" bg="cyan.500" />
+                <Text
+                    fontSize="xs"
+                    fontWeight="semibold"
+                    textTransform="uppercase"
+                    letterSpacing="wider"
+                    color="cyan.700"
+                    _dark={{ color: 'cyan.300' }}
+                >
+                    React 19 • Chakra UI
+                </Text>
+            </Flex>
+
+            <Flex
+                mb="8"
+                alignItems="center"
+                justifyContent="center"
+                width="20"
+                height="20"
+                borderRadius="2xl"
+                bgGradient="linear(to-br, cyan.500, purple.500)"
+                boxShadow="lg"
+                color="white"
+            >
+                <Icon>
+                    <HomeIcon size={40} />
+                </Icon>
+            </Flex>
 
             <Text
-                textStyle="6xl"
-                color={{ base: 'gray.900', _dark: 'white' }}
-                fontWeight="bold"
-                mb="10"
+                textStyle="5xl"
+                fontWeight="extrabold"
+                mb="5"
+                maxW="2xl"
+                color="gray.900"
+                _dark={{ color: 'white' }}
             >
                 Bienvenue sur votre projet React
             </Text>
 
             <Text
-                fontSize={{ base: 'lg', sm: 'xl', md: '2xl' }}
-                color={{ base: 'gray.600', _dark: 'gray.300' }}
-                maxW="2xl"
+                fontSize={{ base: 'lg', sm: 'xl' }}
                 mb="10"
+                maxW="2xl"
                 lineHeight="relaxed"
-                fontWeight={500}
+                color="gray.600"
+                _dark={{ color: 'gray.300' }}
             >
                 Ce projet est pré-configuré avec{' '}
-                <Text
-                    as="span"
-                    fontWeight="semibold"
-                    color={{ base: 'teal.600', _dark: 'teal.400' }}
-                >
+                <Text as="span" fontWeight="semibold" color="cyan.600" _dark={{ color: 'cyan.400' }}>
+                    Chakra UI
+                </Text>
+                ,<Text as="span" fontWeight="semibold" color="purple.600" _dark={{ color: 'purple.400' }}>
                     {' '}
-                    Chakra UI{' '}
+                    React Router{' '}
                 </Text>
                 et
-                <Text
-                    as="span"
-                    fontWeight="semibold"
-                    color={{ base: 'pink.600', _dark: 'pink.400' }}
-                >
+                <Text as="span" fontWeight="semibold" color="pink.600" _dark={{ color: 'pink.400' }}>
                     {' '}
                     Lucide Icons{' '}
                 </Text>
                 pour un développement rapide et élégant.
             </Text>
 
-            <Flex direction={{ base: 'column', sm: 'row' }} gap="6" justify="center">
+            <Flex direction={{ base: 'column', sm: 'row' }} gap="4" align="center" justify="center">
                 <Button
                     size="lg"
+                    color="white"
+                    bgGradient="linear(to-r, cyan.500, purple.500)"
                     boxShadow="lg"
+                    borderRadius="full"
+                    _hover={{ transform: 'translateY(-2px)', boxShadow: 'xl' }}
                     transition="all 0.3s"
                     cursor="pointer"
-                    borderRadius="full"
-                    bg={{ base: 'teal.600', _dark: 'teal.400' }}
                 >
-                    <HomeIcon size={28} />
-                    Démarrer
+                    <HomeIcon size={20} /> Démarrer
                 </Button>
 
                 <Button
                     variant="outline"
                     size="lg"
+                    color="purple.600"
+                    borderColor="purple.300"
+                    boxShadow="sm"
+                    borderRadius="full"
+                    _hover={{ bg: 'purple.50', transform: 'translateY(-2px)', boxShadow: 'md' }}
+                    _dark={{ color: 'purple.300', borderColor: 'purple.700', _hover: { bg: 'purple.900' } }}
                     transition="all 0.3s"
                     cursor="pointer"
-                    borderRadius="full"
                 >
-                    Documentation
+                    <HomeIcon size={20} /> Documentation
                 </Button>
             </Flex>
 
-            <ColorModeButton position="fixed" top={5} right={8} />
+            <Box position="fixed" top={5} right={8} zIndex="50">
+                <ToggleMode />
+            </Box>
         </Box>
     );
 }
@@ -199,113 +272,161 @@ export default function Home() {
 
 $react_vite_chakra_project_not_found_page_content = @'
 import { Link, useNavigate } from 'react-router-dom';
-import { Box, Button, Flex, Heading, Icon, Text } from '@chakra-ui/react';
+import { Box, Button, Flex, Icon, Text } from '@chakra-ui/react';
 import { ArrowLeft, BanIcon, HomeIcon } from 'lucide-react';
+import ToggleMode from '@/components/ToggleMode';
 
 export default function NotFound() {
     const navigate = useNavigate();
 
     return (
         <Box
+            position="relative"
             minHeight="100vh"
+            overflow="hidden"
             display="flex"
-            flexDir="column"
+            flexDirection="column"
             alignItems="center"
             justifyContent="center"
             paddingInline="6"
+            paddingY="16"
             textAlign="center"
             transition="colors"
             bgGradient={{
-                base: 'linear(to-br, cyan.50, purple.50, pink.50)',
-                _dark: 'linear(to-br, gray.900, gray.800, gray.900)',
+                base: 'linear(to-br, slate.50, white, indigo.50)',
+                _dark: 'linear(to-br, gray.950, gray.900, indigo.950)',
             }}
         >
-            <Icon
-                color={{ base: 'pink.600', _dark: 'pink.400' }}
-                animation="pulse"
-                marginBottom="6"
+            <Box
+                position="absolute"
+                top="-6rem"
+                left="-6rem"
+                width="18rem"
+                height="18rem"
+                bg="pink.400"
+                opacity="0.15"
+                borderRadius="full"
+                filter="blur(3rem)"
+                pointerEvents="none"
+            />
+            <Box
+                position="absolute"
+                bottom="-6rem"
+                right="-6rem"
+                width="18rem"
+                height="18rem"
+                bg="purple.500"
+                opacity="0.15"
+                borderRadius="full"
+                filter="blur(3rem)"
+                pointerEvents="none"
+            />
+
+            <Flex
+                alignItems="center"
+                gap="2"
+                mb="6"
+                px="4"
+                py="1.5"
+                borderRadius="full"
+                borderWidth="1px"
+                borderColor="pink.200"
+                bg="whiteAlpha.700"
+                backdropFilter="blur(8px)"
+                boxShadow="sm"
+                _dark={{ borderColor: 'pink.800', bg: 'gray.800' }}
             >
-                <BanIcon size={50} />
-            </Icon>
+                <Text
+                    fontSize="xs"
+                    fontWeight="semibold"
+                    textTransform="uppercase"
+                    letterSpacing="wider"
+                    color="pink.600"
+                    _dark={{ color: 'pink.300' }}
+                >
+                    Erreur 404
+                </Text>
+            </Flex>
+
+            <Flex
+                mb="8"
+                alignItems="center"
+                justifyContent="center"
+                width="20"
+                height="20"
+                borderRadius="2xl"
+                bgGradient="linear(to-br, pink.500, purple.500)"
+                boxShadow="lg"
+                color="white"
+            >
+                <Icon>
+                    <BanIcon size={40} />
+                </Icon>
+            </Flex>
 
             <Text
-                fontSize="sm"
-                fontWeight="semibold"
-                px="4"
-                py="1"
-                borderRadius="full"
-                bg={{ base: 'pink.100', _dark: 'pink.300' }}
-                color={{ base: 'pink.600', _dark: 'pink.900' }}
-                mb="4"
-                boxShadow="sm"
-            >
-                Erreur 404
-            </Text>
-
-            <Heading
-                as="h1"
-                fontSize={{ base: '3xl', sm: '4xl', md: '5xl' }}
+                textStyle="5xl"
                 fontWeight="extrabold"
-                color={{ base: 'gray.900', _dark: 'white' }}
-                mb="6"
-                textShadow="lg"
+                mb="5"
+                maxW="2xl"
+                color="gray.900"
+                _dark={{ color: 'white' }}
             >
                 Page introuvable
-            </Heading>
+            </Text>
 
             <Text
                 fontSize={{ base: 'lg', sm: 'xl' }}
-                color={{ base: 'gray.600', _dark: 'gray.300' }}
-                maxW="2xl"
                 mb="10"
+                maxW="2xl"
                 lineHeight="relaxed"
+                color="gray.600"
+                _dark={{ color: 'gray.300' }}
             >
                 Oups... la page que vous cherchez semble avoir disparu 🫥 <br />
-                Vérifiez l’URL ou revenez à une page connue.
+                Vérifiez l'URL ou revenez à une page connue.
             </Text>
 
-            <Flex direction={{ base: 'column', sm: 'row' }} gap="6" justify="center">
+            <Flex direction={{ base: 'column', sm: 'row' }} gap="4" align="center" justify="center">
                 <Button
                     size="lg"
-                    onClick={() => navigate(-1)}
+                    color="white"
+                    bgGradient="linear(to-r, pink.500, purple.500)"
                     boxShadow="lg"
-                    transition="all 0.3s"
-                    bg={{ base: 'teal.600', _dark: 'teal.400' }}
                     borderRadius="full"
-                    _hover={{
-                        transform: 'translateY(-4px)',
-                    }}
+                    onClick={() => navigate(-1)}
+                    _hover={{ transform: 'translateY(-2px)', boxShadow: 'xl' }}
+                    transition="all 0.3s"
                     cursor="pointer"
                 >
-                    <ArrowLeft />
-                    Retour
+                    <ArrowLeft size={20} /> Retour
                 </Button>
 
                 <Link to="/">
                     <Button
                         variant="outline"
                         size="lg"
-                        color={{ base: 'purple.600', _dark: 'purple.300' }}
-                        borderColor={{ base: 'purple.700', _dark: 'purple.300' }}
-                        boxShadow="md"
-                        transition="all 0.3s"
-                        _hover={{
-                            bg: { base: 'purple.50', _dark: 'purple.800' },
-                            color: { base: 'purple.600', _dark: 'purple.400' },
-                            transform: 'translateY(-4px)',
-                        }}
+                        color="purple.600"
+                        borderColor="purple.300"
+                        boxShadow="sm"
                         borderRadius="full"
+                        _hover={{ bg: 'purple.50', transform: 'translateY(-2px)', boxShadow: 'md' }}
+                        _dark={{ color: 'purple.300', borderColor: 'purple.700', _hover: { bg: 'purple.900' } }}
+                        transition="all 0.3s"
                         cursor="pointer"
                     >
-                        <HomeIcon />
-                        Accueil
+                        <HomeIcon size={20} /> Accueil
                     </Button>
                 </Link>
             </Flex>
 
-            <Text mt="10" fontSize="sm" color={{ base: 'gray.400', _dark: 'gray.500' }}>
+            <Text mt="10" fontSize="sm" color="gray.400" _dark={{ color: 'gray.500' }}>
                 Code erreur : 404 — Ressource introuvable
             </Text>
+
+            <Box position="fixed" top={5} right={8} zIndex="50">
+                <ToggleMode />
+            </Box>
         </Box>
     );
 }
@@ -319,19 +440,70 @@ export default function DefaultLayout() {
 }
 '@
 
+$react_vite_chakra_project_toggle_mode_content = @'
+import { Flex, Select, Text } from '@chakra-ui/react';
+import { useTheme } from 'next-themes';
+import { Monitor, Moon, Sun } from 'lucide-react';
+
+const OPTIONS = [
+    { value: 'system', label: 'System', Icon: Monitor },
+    { value: 'light', label: 'Light', Icon: Sun },
+    { value: 'dark', label: 'Dark', Icon: Moon },
+] as const;
+
+export default function ToggleMode({ className }: { className?: string }) {
+    const { theme, setTheme } = useTheme();
+
+    const current = theme ?? 'system';
+    const CurrentIcon = OPTIONS.find((o) => o.value === current)?.Icon ?? Monitor;
+
+    return (
+        <Select.Root
+            className={className}
+            size="sm"
+            width="fit-content"
+            value={current}
+            onValueChange={(e) => setTheme(e.value)}
+        >
+            <Select.Trigger>
+                <Flex align="center" gap="2">
+                    <CurrentIcon size={18} />
+                    <Select.ValueText placeholder="Theme">
+                        <Text textTransform="capitalize">{current}</Text>
+                    </Select.ValueText>
+                </Flex>
+                <Select.Indicator />
+            </Select.Trigger>
+
+            <Select.Content>
+                {OPTIONS.map(({ value, label, Icon }) => (
+                    <Select.Item key={value} value={value}>
+                        <Flex align="center" gap="2">
+                            <Icon size={18} />
+                            <span>{label}</span>
+                        </Flex>
+                        <Select.ItemIndicator />
+                    </Select.Item>
+                ))}
+            </Select.Content>
+        </Select.Root>
+    );
+}
+'@
+
 function New-ReactViteChakraUi {
     param([string]$PROJECT_NAME)
 
     if (-not $PROJECT_NAME) { $PROJECT_NAME = Read-Host "Project name" }
 
-    Write-Host "Creating project: $PROJECT_NAME (Vite + React 18 + Chakra UI + TypeScript)"
-    Write-Output n | npx create-vite@latest "$PROJECT_NAME" --template react-ts
+    Write-Host "Creating project: $PROJECT_NAME (Vite + React 19 + Chakra UI + TypeScript)"
+    npx create-vite@latest "$PROJECT_NAME" --template react-ts
 
     Set-Location "$PROJECT_NAME"
 
     Clear-Host
     Write-Host "Installing dependencies..."
-    npm install react-router-dom @chakra-ui/react @emotion/react lucide-react@next
+    npm install react-router-dom @chakra-ui/react @emotion/react lucide-react next-themes
     npx @chakra-ui/cli snippet add color-mode
 
     $PRETTIE = Read-Host "Would you like to install Prettier? (Y/N)"
@@ -361,6 +533,7 @@ function New-ReactViteChakraUi {
     Set-Content "src/pages/Home.tsx" -Value $react_vite_chakra_project_home_page_content -Encoding UTF8
     Set-Content "src/pages/NotFound.tsx" -Value $react_vite_chakra_project_not_found_page_content -Encoding UTF8
     Set-Content "src/layouts/default.tsx" -Value $react_vite_chakra_project_default_layout_content -Encoding UTF8
+    Set-Content "src/components/ToggleMode.tsx" -Value $react_vite_chakra_project_toggle_mode_content -Encoding UTF8
 
     if ($PRETTIE.Trim() -match '^[Yy]') {
         npm run format
