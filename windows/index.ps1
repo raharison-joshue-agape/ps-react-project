@@ -1,11 +1,11 @@
-. "$HOME\.config\alias\react-aliases-project\materialUI.ps1"
-. "$HOME\.config\alias\react-aliases-project\shadecnUI.ps1"
-. "$HOME\.config\alias\react-aliases-project\heroUI.ps1"
-. "$HOME\.config\alias\react-aliases-project\chakraUI.ps1"
-. "$HOME\.config\alias\react-aliases-project\reactBootstrap.ps1"
-. "$HOME\.config\alias\react-aliases-project\antd.ps1"
-. "$HOME\.config\alias\react-aliases-project\mantine.ps1"
-. "$HOME\.config\alias\react-aliases-project\daisyui.ps1"
+. "$PSScriptRoot\materialUI.ps1"
+. "$PSScriptRoot\shadecnUI.ps1"
+. "$PSScriptRoot\heroUI.ps1"
+. "$PSScriptRoot\chakraUI.ps1"
+. "$PSScriptRoot\reactBootstrap.ps1"
+. "$PSScriptRoot\antd.ps1"
+. "$PSScriptRoot\mantine.ps1"
+. "$PSScriptRoot\daisyui.ps1"
 
 $prettierrc_content = @'
 {
@@ -28,6 +28,17 @@ coverage/
 .vite/
 '@
 
+<#
+.SYNOPSIS
+    Installe et configure Prettier dans le projet courant.
+
+.DESCRIPTION
+    Installe Prettier en dépendance de développement, ajoute le script npm "format",
+    puis crée les fichiers .prettierrc et .prettierignore.
+
+.EXAMPLE
+    Install-Prettier
+#>
 function Install-Prettier {
     Write-Host "Installation de Prettier..." -ForegroundColor Cyan
     npm install -D prettier | Out-Null
@@ -40,11 +51,36 @@ function Install-Prettier {
     Write-Host "Exécutez `npm run format` pour formater votre projet."
 }
 
+<#
+.SYNOPSIS
+    Crée un projet Vite + React + TypeScript (template de base).
+
+.PARAMETER PROJECT_NAME
+    Nom du répertoire du projet à créer.
+
+.EXAMPLE
+    New-ReactVite myapp
+#>
 function New-ReactVite {
     param([string]$PROJECT_NAME)
     npx create-vite@latest $PROJECT_NAME --template react-ts
 }
 
+<#
+.SYNOPSIS
+    Scaffold un projet React + Vite + TypeScript avec une bibliothèque UI/UX au choix.
+
+.DESCRIPTION
+    Affiche un menu interactif proposant 9 bibliothèques UI/UX (Material UI, Shadcn UI,
+    Hero UI, Chakra UI, React Bootstrap, Mantine, Ant Design, DaisyUI...), crée le projet,
+    installe les dépendances, configure l'alias "@" vers src/ et le sélecteur de thème.
+
+.PARAMETER PROJECT_NAME
+    Nom du projet. Optionnel : s'il est vide, il est demandé interactivement.
+
+.EXAMPLE
+    New-React myapp
+#>
 function New-React {
     param([string]$PROJECT_NAME)
 

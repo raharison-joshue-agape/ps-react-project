@@ -320,6 +320,20 @@ export default function ToggleMode({ className }: { className?: string }) {
 }
 '@
 
+<#
+.SYNOPSIS
+    Crée un projet Vite + React 19 + React Bootstrap + TypeScript pré-configuré.
+
+.DESCRIPTION
+    Installe React Bootstrap, Bootstrap 5 et Bootstrap Icons, puis génère le layout,
+    les pages Home/404 et le sélecteur de thème (Clair / Sombre / Système).
+
+.PARAMETER PROJECT_NAME
+    Nom du répertoire du projet à créer.
+
+.EXAMPLE
+    New-ReactViteBootstrap myapp
+#>
 function New-ReactViteBootstrap {
     param([string]$PROJECT_NAME)
 

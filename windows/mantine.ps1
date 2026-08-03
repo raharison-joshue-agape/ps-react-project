@@ -330,6 +330,20 @@ export default function ToggleMode({ className }: { className?: string }) {
 }
 '@
 
+<#
+.SYNOPSIS
+    Crée un projet Vite + React 19 + Mantine + TypeScript pré-configuré.
+
+.DESCRIPTION
+    Installe Mantine (core + hooks) et Tabler Icons, puis génère le layout,
+    les pages Home/404 et le sélecteur de thème (Clair / Sombre / Système).
+
+.PARAMETER PROJECT_NAME
+    Nom du répertoire du projet à créer.
+
+.EXAMPLE
+    New-ReactViteMantine myapp
+#>
 function New-ReactViteMantine {
     param([string]$PROJECT_NAME)
 

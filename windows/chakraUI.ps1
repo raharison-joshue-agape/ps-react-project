@@ -491,6 +491,20 @@ export default function ToggleMode({ className }: { className?: string }) {
 }
 '@
 
+<#
+.SYNOPSIS
+    Crée un projet Vite + React 19 + Chakra UI + TypeScript pré-configuré.
+
+.DESCRIPTION
+    Installe Chakra UI v3, React Router, Lucide Icons et next-themes, puis génère le layout,
+    les pages Home/404 et le sélecteur de thème (Clair / Sombre / Système).
+
+.PARAMETER PROJECT_NAME
+    Nom du répertoire du projet à créer.
+
+.EXAMPLE
+    New-ReactViteChakraUi myapp
+#>
 function New-ReactViteChakraUi {
     param([string]$PROJECT_NAME)
 

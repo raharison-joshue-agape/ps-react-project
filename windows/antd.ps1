@@ -335,6 +335,20 @@ export default function ToggleMode({ className }: { className?: string }) {
 }
 '@
 
+<#
+.SYNOPSIS
+    Crée un projet Vite + React 19 + Ant Design + TypeScript pré-configuré.
+
+.DESCRIPTION
+    Installe Ant Design et Ant Design Icons, puis génère le layout,
+    les pages Home/404 et le sélecteur de thème (Clair / Sombre / Système).
+
+.PARAMETER PROJECT_NAME
+    Nom du répertoire du projet à créer.
+
+.EXAMPLE
+    New-ReactViteAntd myapp
+#>
 function New-ReactViteAntd {
     param([string]$PROJECT_NAME)
 

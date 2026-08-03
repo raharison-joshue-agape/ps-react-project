@@ -1,4 +1,4 @@
-$react_vite_heroui_project_config_content = @'
+$react_vite_mui_project_config_content = @'
 import { defineConfig } from 'vite';
 import { fileURLToPath, URL } from 'node:url';
 import react from '@vitejs/plugin-react';
@@ -20,7 +20,7 @@ export default defineConfig({
 });
 '@
 
-$react_vite_heroui_project_tsconfig_app_content = @'
+$react_vite_mui_project_tsconfig_app_content = @'
 {
     "compilerOptions": {
         "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
@@ -56,121 +56,106 @@ $react_vite_heroui_project_tsconfig_app_content = @'
 }
 '@
 
-$react_vite_heroui_project_main_content = @'
+$react_vite_mui_project_main_content = @'
 import '@/styles/index.css';
+import '@fontsource/roboto/300.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/700.css';
 
-import router from '@/routes';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
-import { ThemeProvider } from './theme/ThemeProvider';
+import { StyledEngineProvider } from '@mui/material/styles';
+import GlobalStyles from '@mui/material/GlobalStyles';
+import router from '@/routes';
+
+import { ThemeProviderWrapper } from '@/theme/ThemeContext';
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
-        <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-            <RouterProvider router={router} />
-        </ThemeProvider>
+        <ThemeProviderWrapper>
+            <StyledEngineProvider enableCssLayer>
+                <GlobalStyles styles="@layer theme, base, mui, components, utilities;" />
+                <RouterProvider router={router} />
+            </StyledEngineProvider>
+        </ThemeProviderWrapper>
     </StrictMode>,
 );
 '@
 
-$react_vite_heroui_project_theme_content = @'
-import { createContext, type ReactNode, useContext, useEffect, useState } from 'react';
+$react_vite_mui_project_theme_content = @'
+import { createContext, type ReactNode, useContext, useEffect, useMemo, useState } from 'react';
+import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 
-type Theme = 'dark' | 'light' | 'system';
+type ThemeMode = 'light' | 'dark' | 'system';
 
-type ThemeProviderProps = {
-    children: ReactNode;
-    defaultTheme?: Theme;
-    storageKey?: string;
-};
-
-type ThemeProviderState = {
-    theme: Theme;
-    setTheme: (theme: Theme) => void;
-};
-
-const initialState: ThemeProviderState = {
-    theme: 'system',
-    setTheme: () => null,
-};
-
-const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
-
-export function ThemeProvider({
-    children,
-    defaultTheme = 'system',
-    storageKey = 'vite-ui-theme',
-    ...props
-}: ThemeProviderProps) {
-    const [theme, setTheme] = useState<Theme>(
-        () => (localStorage.getItem(storageKey) as Theme) || defaultTheme,
-    );
-
-    useEffect(() => {
-        const root = window.document.documentElement;
-
-        root.classList.remove('light', 'dark');
-
-        if (theme === 'system') {
-            const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
-                ? 'dark'
-                : 'light';
-
-            root.classList.add(systemTheme);
-            return;
-        }
-
-        root.classList.add(theme);
-    }, [theme]);
-
-    useEffect(() => {
-        if (theme !== 'system') return;
-
-        const media = window.matchMedia('(prefers-color-scheme: dark)');
-        const onChange = () => {
-            const root = window.document.documentElement;
-            root.classList.remove('light', 'dark');
-            root.classList.add(media.matches ? 'dark' : 'light');
-        };
-
-        media.addEventListener('change', onChange);
-        return () => media.removeEventListener('change', onChange);
-    }, [theme]);
-
-    const value = {
-        theme,
-        setTheme: (theme: Theme) => {
-            localStorage.setItem(storageKey, theme);
-            setTheme(theme);
-        },
-    };
-
-    return (
-        <ThemeProviderContext.Provider {...props} value={value}>
-            {children}
-        </ThemeProviderContext.Provider>
-    );
+interface ThemeContextType {
+    mode: ThemeMode;
+    setMode: (mode: ThemeMode) => void;
 }
 
-export const UseTheme = () => {
-    const context = useContext(ThemeProviderContext);
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-    if (context === undefined) throw new Error('useTheme must be used within a ThemeProvider');
-
+export function UseThemeMode() {
+    const context = useContext(ThemeContext);
+    if (!context) throw new Error('useThemeMode must be used within ThemeProviderWrapper');
     return context;
-};
+}
+
+interface Props {
+    children: ReactNode;
+}
+
+export function ThemeProviderWrapper({ children }: Props) {
+    const [mode, setMode] = useState<ThemeMode>(() => {
+        return (localStorage.getItem('theme') as ThemeMode) || 'system';
+    });
+    const [systemDark, setSystemDark] = useState(() =>
+        window.matchMedia('(prefers-color-scheme: dark)').matches,
+    );
+
+    useEffect(() => {
+        const media = window.matchMedia('(prefers-color-scheme: dark)');
+        const onChange = () => setSystemDark(media.matches);
+        media.addEventListener('change', onChange);
+        return () => media.removeEventListener('change', onChange);
+    }, []);
+
+    const isDark = mode === 'system' ? systemDark : mode === 'dark';
+
+    useEffect(() => {
+        const root = document.documentElement;
+        root.classList.toggle('dark', isDark);
+        localStorage.setItem('theme', mode);
+    }, [mode, isDark]);
+
+    const muiTheme = useMemo(
+        () =>
+            createTheme({
+                palette: { mode: isDark ? 'dark' : 'light', primary: { main: '#06b6d4' } },
+            }),
+        [isDark],
+    );
+
+    return (
+        <ThemeContext.Provider value={{ mode, setMode }}>
+            <ThemeProvider theme={muiTheme}>
+                <CssBaseline />
+                {children}
+            </ThemeProvider>
+        </ThemeContext.Provider>
+    );
+}
 '@
 
-$react_vite_heroui_project_style_content = @'
-@layer theme, base, components, utilities;
+$react_vite_mui_project_style_content = @'
+@layer theme, base, mui, components, utilities;
 @import 'tailwindcss';
-@import '@heroui/styles';
-
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:where(.dark, .dark *));
 '@
 
-$react_vite_heroui_project_route_content = @'
+$react_vite_mui_project_route_content = @'
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import DefaultLayout from '@/layouts/default';
 import Home from '@/pages/Home';
@@ -192,12 +177,12 @@ const router = createBrowserRouter([
 export default router;
 '@
 
-$react_vite_heroui_project_home_page_content = @'
+$react_vite_mui_project_home_page_content = @'
+import { Button } from '@mui/material';
+import { Home as HomeIcon, MenuBook, RocketLaunch } from '@mui/icons-material';
 import ToggleMode from '@/components/ToggleMode';
-import { Button } from '@heroui/react';
-import { BookOpen, HomeIcon, Rocket } from 'lucide-react';
 
-export default function Home() {
+export default function HomePage() {
     return (
         <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 py-16 text-center bg-linear-to-br from-slate-50 via-white to-indigo-50 transition-colors dark:from-gray-950 dark:via-gray-900 dark:to-indigo-950">
             <div className="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-cyan-400/20 blur-3xl" />
@@ -208,11 +193,11 @@ export default function Home() {
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75" />
                     <span className="relative inline-flex h-2 w-2 rounded-full bg-cyan-500" />
                 </span>
-                React 19 • Hero UI
+                React 19 • Material UI
             </span>
 
             <span className="mb-8 inline-flex h-20 w-20 items-center justify-center rounded-2xl bg-linear-to-br from-cyan-500 to-purple-500 text-white shadow-lg shadow-cyan-500/25">
-                <HomeIcon size={40} />
+                <HomeIcon fontSize="large" />
             </span>
 
             <h1 className="mb-5 max-w-2xl text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl dark:text-white">
@@ -221,31 +206,30 @@ export default function Home() {
 
             <p className="mb-10 max-w-2xl text-lg leading-relaxed text-gray-600 sm:text-xl dark:text-gray-300">
                 Ce projet est pré-configuré avec{' '}
-                <span className="font-semibold text-cyan-600 dark:text-cyan-400"> Hero UI</span>,
+                <span className="font-semibold text-cyan-600 dark:text-cyan-400"> Material UI</span>,
                 <span className="font-semibold text-purple-600 dark:text-purple-400"> TailwindCSS</span>{' '}
                 et
                 <span className="font-semibold text-pink-600 dark:text-pink-400">
                     {' '}
-                    Lucide Icons{' '}
+                    Material Icons{' '}
                 </span>
                 pour un développement rapide et élégant.
             </p>
 
             <div className="flex flex-col items-center gap-4 sm:flex-row">
                 <Button
-                    color="primary"
-                    size="lg"
-                    startContent={<Rocket size={20} />}
+                    variant="contained"
+                    size="large"
+                    startIcon={<RocketLaunch />}
                     className="bg-linear-to-r from-cyan-500 to-purple-500 text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:from-purple-500 hover:to-cyan-500"
                 >
                     Démarrer
                 </Button>
 
                 <Button
-                    variant="bordered"
-                    color="secondary"
-                    size="lg"
-                    startContent={<BookOpen size={20} />}
+                    variant="outlined"
+                    size="large"
+                    startIcon={<MenuBook />}
                     className="border-purple-300 text-purple-600 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-purple-50 dark:border-purple-700 dark:text-purple-300 dark:hover:bg-purple-900/50"
                 >
                     Documentation
@@ -258,11 +242,12 @@ export default function Home() {
 }
 '@
 
-$react_vite_heroui_project_not_found_page_content = @'
-import ToggleMode from '@/components/ToggleMode';
-import { Button } from '@heroui/react';
-import { ArrowLeft, Ban, HomeIcon } from 'lucide-react';
+$react_vite_mui_project_not_found_page_content = @'
+import { Button } from '@mui/material';
+import { Block, Home } from '@mui/icons-material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Link, useNavigate } from 'react-router-dom';
+import ToggleMode from '@/components/ToggleMode';
 
 export default function NotFound() {
     const navigate = useNavigate();
@@ -277,7 +262,7 @@ export default function NotFound() {
             </span>
 
             <span className="mb-8 inline-flex h-20 w-20 items-center justify-center rounded-2xl bg-linear-to-br from-pink-500 to-purple-500 text-white shadow-lg shadow-pink-500/25">
-                <Ban size={40} />
+                <Block fontSize="large" />
             </span>
 
             <h1 className="mb-5 max-w-2xl text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl dark:text-white">
@@ -291,9 +276,9 @@ export default function NotFound() {
 
             <div className="flex flex-col items-center gap-4 sm:flex-row">
                 <Button
-                    color="primary"
-                    size="lg"
-                    startContent={<ArrowLeft size={20} />}
+                    variant="contained"
+                    size="large"
+                    startIcon={<ArrowBackIcon />}
                     onClick={() => navigate(-1)}
                     className="bg-linear-to-r from-pink-500 to-purple-500 text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:from-purple-500 hover:to-pink-500"
                 >
@@ -302,10 +287,9 @@ export default function NotFound() {
 
                 <Link to="/">
                     <Button
-                        variant="bordered"
-                        color="secondary"
-                        size="lg"
-                        startContent={<HomeIcon size={20} />}
+                        variant="outlined"
+                        size="large"
+                        startIcon={<Home />}
                         className="border-purple-300 text-purple-600 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-purple-50 dark:border-purple-700 dark:text-purple-300 dark:hover:bg-purple-900/50"
                     >
                         Accueil
@@ -321,7 +305,7 @@ export default function NotFound() {
 }
 '@
 
-$react_vite_heroui_project_default_layout_content = @'
+$react_vite_mui_project_default_layout_content = @'
 import { Outlet } from 'react-router-dom';
 
 export default function DefaultLayout() {
@@ -329,68 +313,80 @@ export default function DefaultLayout() {
 }
 '@
 
-$react_vite_heroui_project_toggle_mode_content = @'
-import { UseTheme } from '@/theme/ThemeProvider';
-import { ListBox, Select } from '@heroui/react';
-import { Monitor, Moon, Sun } from 'lucide-react';
+$react_vite_mui_project_toogle_mode_content = @'
+import { UseThemeMode } from '@/theme/ThemeContext';
+import { Box, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
+import SunnyIcon from '@mui/icons-material/Sunny';
+import BedtimeIcon from '@mui/icons-material/Bedtime';
+import LaptopWindowsIcon from '@mui/icons-material/LaptopWindows';
 
 const OPTIONS = [
-    { value: 'system', label: 'System', Icon: Monitor },
-    { value: 'light', label: 'Light', Icon: Sun },
-    { value: 'dark', label: 'Dark', Icon: Moon },
+    { value: 'system', label: 'System', Icon: LaptopWindowsIcon },
+    { value: 'light', label: 'Light', Icon: SunnyIcon },
+    { value: 'dark', label: 'Dark', Icon: BedtimeIcon },
 ] as const;
 
 export default function ToggleMode({ className }: { className?: string }) {
-    const { theme, setTheme } = UseTheme();
+    const { mode, setMode } = UseThemeMode();
 
-    const CurrentIcon = OPTIONS.find((o) => o.value === theme)?.Icon ?? Monitor;
+    const current = OPTIONS.find((o) => o.value === mode) ?? OPTIONS[0];
+    const CurrentIcon = current.Icon;
 
     return (
-        <Select
-            aria-label="Changer de thème"
-            className={`w-44 ${className ?? ''}`}
-            selectedKey={theme}
-            onSelectionChange={(key) => setTheme(key as 'dark' | 'light' | 'system')}
-        >
-            <Select.Trigger>
-                <div className="flex items-center gap-2">
-                    <CurrentIcon size={18} />
-                    <Select.Value />
-                </div>
-                <Select.Indicator />
-            </Select.Trigger>
-
-            <Select.Popover>
-                <ListBox>
-                    {OPTIONS.map(({ value, label, Icon }) => (
-                        <ListBox.Item key={value} id={value} textValue={label}>
-                            <div className="flex items-center gap-2">
-                                <Icon size={20} />
-                                <span>{label}</span>
-                            </div>
-                            <ListBox.ItemIndicator />
-                        </ListBox.Item>
-                    ))}
-                </ListBox>
-            </Select.Popover>
-        </Select>
+        <FormControl size="small" className={className} sx={{ minWidth: 130 }}>
+            <InputLabel id="theme-select-label">Theme</InputLabel>
+            <Select
+                labelId="theme-select-label"
+                label="Theme"
+                value={mode}
+                onChange={(e) => setMode(e.target.value as 'light' | 'dark' | 'system')}
+                renderValue={() => (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <CurrentIcon fontSize="small" />
+                        <span style={{ textTransform: 'capitalize' }}>{current.label}</span>
+                    </Box>
+                )}
+                MenuProps={{ slotProps: { paper: { style: { borderRadius: 12, marginTop: 4 } } } }}
+            >
+                {OPTIONS.map(({ value, label, Icon }) => (
+                    <MenuItem key={value} value={value}>
+                        <Icon sx={{ mr: 1 }} fontSize="small" />
+                        {label}
+                    </MenuItem>
+                ))}
+            </Select>
+        </FormControl>
     );
 }
 '@
 
-function New-ReactViteHeroUi {
+<#
+.SYNOPSIS
+    Crée un projet Vite + React 19 + Material UI + TypeScript pré-configuré.
+
+.DESCRIPTION
+    Installe MUI, React Router, TailwindCSS et Material Icons, puis génère le layout,
+    les pages Home/404 et le sélecteur de thème (Clair / Sombre / Système).
+
+.PARAMETER PROJECT_NAME
+    Nom du répertoire du projet à créer.
+
+.EXAMPLE
+    New-ReactViteMaterialUi myapp
+#>
+function New-ReactViteMaterialUi {
     param([string]$PROJECT_NAME)
 
     if (-not $PROJECT_NAME) { $PROJECT_NAME = Read-Host "Project name" }
 
-    Write-Host "Creating project: $PROJECT_NAME (Vite + React 19 + Hero UI + TypeScript)"
+    Write-Host "Creating project: $PROJECT_NAME (Vite + React 19 + MUI + TypeScript)"
     npx create-vite@latest "$PROJECT_NAME" --template react-ts
 
     Set-Location "$PROJECT_NAME"
 
     Clear-Host
     Write-Host "Installing dependencies..."
-    npm install @heroui/styles @heroui/react react-router-dom tailwindcss @tailwindcss/vite lucide-react
+    npm install @mui/material @emotion/react @emotion/styled @fontsource/roboto @mui/icons-material react-router-dom tailwindcss @tailwindcss/vite
 
     $PRETTIE = Read-Host "Would you like to install Prettier? (Y/N)"
     if ($PRETTIE.Trim() -match '^[Yy]') {
@@ -411,16 +407,16 @@ function New-ReactViteHeroUi {
     )
     foreach ($d in $dirs) { if (-not (Test-Path $d)) { New-Item -ItemType Directory -Path $d -Force | Out-Null } }
 
-    Set-Content "vite.config.ts" -Value $react_vite_heroui_project_config_content -Encoding UTF8
-    Set-Content "tsconfig.app.json" -Value $react_vite_heroui_project_tsconfig_app_content -Encoding UTF8
-    Set-Content "src/styles/index.css" -Value $react_vite_heroui_project_style_content -Encoding UTF8
-    Set-Content "src/main.tsx" -Value $react_vite_heroui_project_main_content -Encoding UTF8
-    Set-Content "src/theme/ThemeProvider.tsx" -Value $react_vite_heroui_project_theme_content -Encoding UTF8
-    Set-Content "src/routes/index.tsx" -Value $react_vite_heroui_project_route_content -Encoding UTF8
-    Set-Content "src/pages/Home.tsx" -Value $react_vite_heroui_project_home_page_content -Encoding UTF8
-    Set-Content "src/pages/NotFound.tsx" -Value $react_vite_heroui_project_not_found_page_content -Encoding UTF8
-    Set-Content "src/layouts/default.tsx" -Value $react_vite_heroui_project_default_layout_content -Encoding UTF8
-    Set-Content "src/components/ToggleMode.tsx" -Value $react_vite_heroui_project_toggle_mode_content -Encoding UTF8
+    Set-Content "vite.config.ts" -Value $react_vite_mui_project_config_content -Encoding UTF8
+    Set-Content "tsconfig.app.json" -Value $react_vite_mui_project_tsconfig_app_content -Encoding UTF8
+    Set-Content "src/main.tsx" -Value $react_vite_mui_project_main_content -Encoding UTF8
+    Set-Content "src/theme/ThemeContext.tsx" -Value $react_vite_mui_project_theme_content -Encoding UTF8
+    Set-Content "src/styles/index.css" -Value $react_vite_mui_project_style_content -Encoding UTF8
+    Set-Content "src/routes/index.tsx" -Value $react_vite_mui_project_route_content -Encoding UTF8
+    Set-Content "src/pages/Home.tsx" -Value $react_vite_mui_project_home_page_content -Encoding UTF8
+    Set-Content "src/pages/NotFound.tsx" -Value $react_vite_mui_project_not_found_page_content -Encoding UTF8
+    Set-Content "src/layouts/default.tsx" -Value $react_vite_mui_project_default_layout_content -Encoding UTF8
+    Set-Content "src/components/ToggleMode.tsx" -Value $react_vite_mui_project_toogle_mode_content -Encoding UTF8
 
     if ($PRETTIE.Trim() -match '^[Yy]') {
         npm run format
