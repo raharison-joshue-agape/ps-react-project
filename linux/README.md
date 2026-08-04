@@ -35,7 +35,7 @@ Des fonctions courtes et mémorisables qui remplacent les longues séquences de 
 Au lieu de taper de longues commandes de configuration répétitives, vous utilisez des fonctions courtes qui scaffoldent un projet **React 19 + Vite + TypeScript** complet et pré-configuré en quelques secondes :
 
 ```bash
-new_react myapp            # menu interactif : 9 bibliothèques UI/UX au choix
+new_react myapp            # menu interactif : 16 bibliothèques UI/UX au choix
 new_react_vite myapp       # template Vite + React + TypeScript de base
 new_react_vite_mantine myapp   # scaffold direct avec une bibliothèque précise
 install_prettier           # configure Prettier dans le projet courant
@@ -101,7 +101,7 @@ cd myapp && npm run dev     # → http://localhost:5173
 Les raccourcis se comportent comme des commandes shell natives :
 
 ```bash
-new_react myapp            # scaffolde un projet (menu interactif 1-9)
+new_react myapp            # scaffolde un projet (menu interactif 1-17)
 new_react_vite myapp       # template Vite + React + TS de base
 new_react_vite_material_ui myapp   # Material UI
 new_react_vite_daisy_ui myapp      # DaisyUI
@@ -130,6 +130,14 @@ Affiche un menu interactif, crée le projet avec `create-vite` (sans lancer le s
 | 7  | Vite + Mantine          | Modern hooks-first component library          |
 | 8  | Vite + Ant Design       | Enterprise UI design system                   |
 | 9  | Vite + DaisyUI          | Pure CSS Tailwind components                  |
+| 10 | Vite + PrimeReact       | Enterprise-ready UI component library         |
+| 11 | Vite + Fluent UI        | Microsoft design system components            |
+| 12 | Vite + Semantic UI React | Themeable CSS component framework            |
+| 13 | Vite + Grommet          | Accessible enterprise component library       |
+| 14 | Vite + Arco Design      | ByteDance enterprise UI components            |
+| 15 | Vite + Radix UI         | Headless accessible UI primitives             |
+| 16 | Vite + Headless UI      | Unstyled accessible components                |
+| 17 | Vite + React Spectrum   | Adobe's accessible UI components              |
 
 À la fin de la configuration, le script demande si vous voulez **Prettier** et **Git**, puis lance `npm run dev` (serveur sur **http://localhost:5173**).
 
@@ -144,6 +152,14 @@ new_react_vite_bootstrap myapp
 new_react_vite_mantine myapp
 new_react_vite_antd myapp
 new_react_vite_daisy_ui myapp
+new_react_vite_primereact myapp
+new_react_vite_fluent myapp
+new_react_vite_semantic myapp
+new_react_vite_grommet myapp
+new_react_vite_arco myapp
+new_react_vite_radix myapp
+new_react_vite_headless myapp
+new_react_vite_spectrum myapp
 ```
 
 ### 🖥️ Créer un projet Vite de base
@@ -186,6 +202,14 @@ Le composant **ToggleMode** est adapté à chaque bibliothèque :
 | Ant Design | `Segmented` |
 | Mantine | `SegmentedControl` |
 | DaisyUI | Boutons `join` |
+| PrimeReact | Boutons `Button` (groupe d'icônes) |
+| Fluent UI | `Select` Fluent + `FluentProvider` |
+| Semantic UI React | `Select` Semantic UI |
+| Grommet | `Select` Grommet + `themeMode` |
+| Arco Design | `Radio.Group` type="button" |
+| Radix UI | `DropdownMenu` |
+| Headless UI | `Menu` |
+| React Spectrum | `Picker` + `colorScheme` |
 
 ---
 

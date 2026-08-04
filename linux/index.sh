@@ -13,6 +13,13 @@ _react_aliases_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "$_react_aliases_root/mantine.sh"
 . "$_react_aliases_root/daisyui.sh"
 . "$_react_aliases_root/primereact.sh"
+. "$_react_aliases_root/fluent.sh"
+. "$_react_aliases_root/semantic.sh"
+. "$_react_aliases_root/grommet.sh"
+. "$_react_aliases_root/arco.sh"
+. "$_react_aliases_root/radix.sh"
+. "$_react_aliases_root/headless.sh"
+. "$_react_aliases_root/spectrum.sh"
 
 install_prettier() {
     echo "Installation de Prettier..."
@@ -76,10 +83,24 @@ new_react() {
     echo "     Pure CSS Tailwind components"
     echo "  10. Vite + PrimeReact"
     echo "     Enterprise-ready UI component library"
+    echo "  11. Vite + Fluent UI"
+    echo "     Microsoft design system components"
+    echo "  12. Vite + Semantic UI React"
+    echo "     Themeable CSS component framework"
+    echo "  13. Vite + Grommet"
+    echo "     Accessible enterprise component library"
+    echo "  14. Vite + Arco Design"
+    echo "     ByteDance enterprise UI components"
+    echo "  15. Vite + Radix UI"
+    echo "     Headless accessible UI primitives"
+    echo "  16. Vite + Headless UI"
+    echo "     Unstyled accessible components"
+    echo "  17. Vite + React Spectrum"
+    echo "     Adobe's accessible UI components"
     echo ""
 
     local PROJECT_CHOICE
-    read -r -p "Enter choice (1-10): " PROJECT_CHOICE
+    read -r -p "Enter choice (1-17): " PROJECT_CHOICE
 
     if [ -z "$PROJECT_NAME" ]; then
         read -r -p "Project name: " PROJECT_NAME
@@ -96,6 +117,13 @@ new_react() {
         8) new_react_vite_antd "$PROJECT_NAME" ;;
         9) new_react_vite_daisy_ui "$PROJECT_NAME" ;;
         10) new_react_vite_primereact "$PROJECT_NAME" ;;
+        11) new_react_vite_fluent "$PROJECT_NAME" ;;
+        12) new_react_vite_semantic "$PROJECT_NAME" ;;
+        13) new_react_vite_grommet "$PROJECT_NAME" ;;
+        14) new_react_vite_arco "$PROJECT_NAME" ;;
+        15) new_react_vite_radix "$PROJECT_NAME" ;;
+        16) new_react_vite_headless "$PROJECT_NAME" ;;
+        17) new_react_vite_spectrum "$PROJECT_NAME" ;;
         *)
             echo "Choix invalide. Création d'un projet Vite de base."
             new_react_vite "$PROJECT_NAME"

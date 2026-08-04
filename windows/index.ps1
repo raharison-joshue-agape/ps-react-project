@@ -7,6 +7,13 @@
 . "$PSScriptRoot\mantine.ps1"
 . "$PSScriptRoot\daisyui.ps1"
 . "$PSScriptRoot\primereact.ps1"
+. "$PSScriptRoot\fluent.ps1"
+. "$PSScriptRoot\semantic.ps1"
+. "$PSScriptRoot\grommet.ps1"
+. "$PSScriptRoot\arco.ps1"
+. "$PSScriptRoot\radix.ps1"
+. "$PSScriptRoot\headless.ps1"
+. "$PSScriptRoot\spectrum.ps1"
 
 $prettierrc_content = @'
 {
@@ -72,9 +79,11 @@ function New-ReactVite {
     Scaffold un projet React + Vite + TypeScript avec une bibliothèque UI/UX au choix.
 
 .DESCRIPTION
-    Affiche un menu interactif proposant 9 bibliothèques UI/UX (Material UI, Shadcn UI,
-    Hero UI, Chakra UI, React Bootstrap, Mantine, Ant Design, DaisyUI...), crée le projet,
-    installe les dépendances, configure l'alias "@" vers src/ et le sélecteur de thème.
+    Affiche un menu interactif proposant 16 bibliothèques UI/UX (Material UI, Shadcn UI,
+    Hero UI, Chakra UI, React Bootstrap, Mantine, Ant Design, DaisyUI, PrimeReact,
+    Fluent UI, Semantic UI React, Grommet, Arco Design, Radix UI, Headless UI,
+    React Spectrum), crée le projet, installe les dépendances, configure l'alias "@"
+    vers src/ et le sélecteur de thème.
 
 .PARAMETER PROJECT_NAME
     Nom du projet. Optionnel : s'il est vide, il est demandé interactivement.
@@ -101,6 +110,13 @@ function New-React {
         @{ Id = 8; Name = "Vite + Ant Design"; Desc = "Enterprise UI design system" }
         @{ Id = 9; Name = "Vite + DaisyUI"; Desc = "Pure CSS Tailwind components" }
         @{ Id = 10; Name = "Vite + PrimeReact"; Desc = "Enterprise-ready UI component library" }
+        @{ Id = 11; Name = "Vite + Fluent UI"; Desc = "Microsoft design system components" }
+        @{ Id = 12; Name = "Vite + Semantic UI React"; Desc = "Themeable CSS component framework" }
+        @{ Id = 13; Name = "Vite + Grommet"; Desc = "Accessible enterprise component library" }
+        @{ Id = 14; Name = "Vite + Arco Design"; Desc = "ByteDance enterprise UI components" }
+        @{ Id = 15; Name = "Vite + Radix UI"; Desc = "Headless accessible UI primitives" }
+        @{ Id = 16; Name = "Vite + Headless UI"; Desc = "Unstyled accessible components" }
+        @{ Id = 17; Name = "Vite + React Spectrum"; Desc = "Adobe's accessible UI components" }
     )
 
     foreach ($c in $CHOICES) {
@@ -124,6 +140,13 @@ function New-React {
         "8" { New-ReactViteAntd $PROJECT_NAME }
         "9" { New-ReactViteDaisyUi $PROJECT_NAME }
         "10" { New-ReactVitePrimeReact $PROJECT_NAME }
+        "11" { New-ReactViteFluent $PROJECT_NAME }
+        "12" { New-ReactViteSemantic $PROJECT_NAME }
+        "13" { New-ReactViteGrommet $PROJECT_NAME }
+        "14" { New-ReactViteArco $PROJECT_NAME }
+        "15" { New-ReactViteRadix $PROJECT_NAME }
+        "16" { New-ReactViteHeadless $PROJECT_NAME }
+        "17" { New-ReactViteSpectrum $PROJECT_NAME }
         default {
             Write-Host "Choix invalide. Création d'un projet Vite de base." -ForegroundColor Yellow
             New-ReactVite $PROJECT_NAME

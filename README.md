@@ -48,7 +48,7 @@ Un ensemble de fonctions pour **Bash (Linux)**, **Zsh (macOS)** et **PowerShell 
 | | |
 |---|---|
 | ⚡ **Scaffolding en une commande** | Génère un projet React 19 + Vite + TypeScript pré-configuré (alias `@`, router, thème) depuis une seule commande |
-| 🎨 **10 bibliothèques UI/UX** | Material UI, Shadcn UI, Hero UI, Chakra UI, React Bootstrap, Mantine, Ant Design, DaisyUI, PrimeReact + template de base |
+| 🎨 **16 bibliothèques UI/UX** | Material UI, Shadcn UI, Hero UI, Chakra UI, React Bootstrap, Mantine, Ant Design, DaisyUI, PrimeReact, Fluent UI, Semantic UI React, Grommet, Arco Design, Radix UI, Headless UI, React Spectrum + template de base |
 | ⏩ **Création non-bloquante** | Flag `--no-immediate` : `create-vite` ne lance pas le serveur de dev avant la configuration |
 | 🔗 **Alias `@` pré-configuré** | `@` → `src/` dans `vite.config.ts` et `tsconfig.app.json` (`paths: { "@/*": ["./src/*"] }`) |
 | 🧭 **React Router** | Layout par défaut, page `/home` et page **404** stylée |
@@ -263,6 +263,13 @@ Affiche un menu interactif :
 | 8  | Vite + Ant Design       | Enterprise UI design system                   |
 | 9  | Vite + DaisyUI          | Pure CSS Tailwind components                  |
 | 10 | Vite + PrimeReact       | Enterprise-ready UI component library         |
+| 11 | Vite + Fluent UI        | Microsoft design system components            |
+| 12 | Vite + Semantic UI React | Themeable CSS component framework            |
+| 13 | Vite + Grommet          | Accessible enterprise component library       |
+| 14 | Vite + Arco Design      | ByteDance enterprise UI components            |
+| 15 | Vite + Radix UI         | Headless accessible UI primitives             |
+| 16 | Vite + Headless UI      | Unstyled accessible components                |
+| 17 | Vite + React Spectrum   | Adobe's accessible UI components              |
 
 > 💡 Le nom du projet est optionnel : laissez vide pour le saisir interactivement.
 
@@ -292,6 +299,13 @@ New-ReactViteMantine myapp
 | `new_react_vite_antd` | `New-ReactViteAntd` | Ant Design |
 | `new_react_vite_daisy_ui` | `New-ReactViteDaisyUi` | DaisyUI |
 | `new_react_vite_primereact` | `New-ReactVitePrimeReact` | PrimeReact |
+| `new_react_vite_fluent` | `New-ReactViteFluent` | Fluent UI |
+| `new_react_vite_semantic` | `New-ReactViteSemantic` | Semantic UI React |
+| `new_react_vite_grommet` | `New-ReactViteGrommet` | Grommet |
+| `new_react_vite_arco` | `New-ReactViteArco` | Arco Design |
+| `new_react_vite_radix` | `New-ReactViteRadix` | Radix UI |
+| `new_react_vite_headless` | `New-ReactViteHeadless` | Headless UI |
+| `new_react_vite_spectrum` | `New-ReactViteSpectrum` | React Spectrum |
 
 Chaque commande scaffolde le projet (`create-vite` avec `--no-immediate`), installe les dépendances de la bibliothèque, configure l'alias `@`, React Router et le sélecteur de thème, demande si vous voulez **Prettier** et **Git**, puis lance `npm run dev`.
 
@@ -334,6 +348,13 @@ Le composant **ToggleMode** est adapté à chaque bibliothèque :
 | Mantine | `SegmentedControl` |
 | DaisyUI | Boutons `join` |
 | PrimeReact | Boutons `Button` (groupe d'icônes) |
+| Fluent UI | `Select` Fluent + `FluentProvider` |
+| Semantic UI React | `Select` Semantic UI |
+| Grommet | `Select` Grommet + `themeMode` |
+| Arco Design | `Radio.Group` type="button" |
+| Radix UI | `DropdownMenu` |
+| Headless UI | `Menu` |
+| React Spectrum | `Picker` + `colorScheme` |
 
 ### 📂 Structure générée
 
@@ -373,7 +394,8 @@ L'implémentation suit une **architecture modulaire en couches**, chaque couche 
 │  Modules bibliothèques UI  │  materialUI.sh/.zsh/.ps1
 │                            │  shadecnUI, heroUI, chakraUI,
 │                            │  reactBootstrap, antd, mantine, daisyui,
-│                            │  primereact
+│                            │  primereact, fluent, semantic, grommet,
+│                            │  arco, radix, headless, spectrum
 └────────────┬───────────────┘
              ▼
 ┌────────────────────────────┐
@@ -402,6 +424,13 @@ L'implémentation suit une **architecture modulaire en couches**, chaque couche 
 | `mantine.sh` / `.zsh` / `.ps1` | `new_react_vite_mantine` / `New-ReactViteMantine` |
 | `daisyui.sh` / `.zsh` / `.ps1` | `new_react_vite_daisy_ui` / `New-ReactViteDaisyUi` |
 | `primereact.sh` / `.zsh` / `.ps1` | `new_react_vite_primereact` / `New-ReactVitePrimeReact` |
+| `fluent.sh` / `.zsh` / `.ps1` | `new_react_vite_fluent` / `New-ReactViteFluent` |
+| `semantic.sh` / `.zsh` / `.ps1` | `new_react_vite_semantic` / `New-ReactViteSemantic` |
+| `grommet.sh` / `.zsh` / `.ps1` | `new_react_vite_grommet` / `New-ReactViteGrommet` |
+| `arco.sh` / `.zsh` / `.ps1` | `new_react_vite_arco` / `New-ReactViteArco` |
+| `radix.sh` / `.zsh` / `.ps1` | `new_react_vite_radix` / `New-ReactViteRadix` |
+| `headless.sh` / `.zsh` / `.ps1` | `new_react_vite_headless` / `New-ReactViteHeadless` |
+| `spectrum.sh` / `.zsh` / `.ps1` | `new_react_vite_spectrum` / `New-ReactViteSpectrum` |
 
 > 💡 **macOS** expose les **mêmes noms de fonctions que Linux** (scripts `.zsh`) — seule l'installation diffère (`~/.zshrc`).
 
@@ -422,6 +451,13 @@ react-aliases-project/
 │   ├── mantine.sh            # new_react_vite_mantine
 │   ├── daisyui.sh            # new_react_vite_daisy_ui
 │   ├── primereact.sh         # new_react_vite_primereact
+│   ├── fluent.sh             # new_react_vite_fluent
+│   ├── semantic.sh           # new_react_vite_semantic
+│   ├── grommet.sh            # new_react_vite_grommet
+│   ├── arco.sh               # new_react_vite_arco
+│   ├── radix.sh              # new_react_vite_radix
+│   ├── headless.sh           # new_react_vite_headless
+│   ├── spectrum.sh           # new_react_vite_spectrum
 │   └── README.md             # Guide d'installation Linux
 ├── macos/                    # Implémentation Zsh pour macOS
 │   ├── index.zsh             # Point d'entrée (charge tous les modules)
@@ -434,6 +470,13 @@ react-aliases-project/
 │   ├── mantine.zsh           # new_react_vite_mantine
 │   ├── daisyui.zsh           # new_react_vite_daisy_ui
 │   ├── primereact.zsh        # new_react_vite_primereact
+│   ├── fluent.zsh            # new_react_vite_fluent
+│   ├── semantic.zsh          # new_react_vite_semantic
+│   ├── grommet.zsh           # new_react_vite_grommet
+│   ├── arco.zsh              # new_react_vite_arco
+│   ├── radix.zsh             # new_react_vite_radix
+│   ├── headless.zsh          # new_react_vite_headless
+│   ├── spectrum.zsh          # new_react_vite_spectrum
 │   └── README.md             # Guide d'installation macOS
 ├── windows/                  # Implémentation PowerShell pour Windows
 │   ├── index.ps1             # Point d'entrée (charge tous les modules)
@@ -446,6 +489,13 @@ react-aliases-project/
 │   ├── mantine.ps1           # New-ReactViteMantine
 │   ├── daisyui.ps1           # New-ReactViteDaisyUi
 │   ├── primereact.ps1        # New-ReactVitePrimeReact
+│   ├── fluent.ps1            # New-ReactViteFluent
+│   ├── semantic.ps1          # New-ReactViteSemantic
+│   ├── grommet.ps1           # New-ReactViteGrommet
+│   ├── arco.ps1              # New-ReactViteArco
+│   ├── radix.ps1             # New-ReactViteRadix
+│   ├── headless.ps1          # New-ReactViteHeadless
+│   ├── spectrum.ps1          # New-ReactViteSpectrum
 │   └── README.md             # Guide d'installation Windows
 └── README.md                 # Ce fichier
 ```
