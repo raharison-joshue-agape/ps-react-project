@@ -340,7 +340,7 @@ function New-ReactViteBootstrap {
     if (-not $PROJECT_NAME) { $PROJECT_NAME = Read-Host "Project name" }
 
     Write-Host "Creating project: $PROJECT_NAME (Vite + React 19 + React Bootstrap + TypeScript)"
-    npx create-vite@latest "$PROJECT_NAME" --template react-ts
+    npx create-vite@latest "$PROJECT_NAME" --template react-ts --no-immediate
 
     Set-Location "$PROJECT_NAME"
 

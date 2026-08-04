@@ -63,7 +63,7 @@ function Install-Prettier {
 #>
 function New-ReactVite {
     param([string]$PROJECT_NAME)
-    npx create-vite@latest $PROJECT_NAME --template react-ts
+    npx create-vite@latest $PROJECT_NAME --template react-ts --no-immediate
 }
 
 <#

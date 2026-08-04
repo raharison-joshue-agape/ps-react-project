@@ -9,7 +9,7 @@ new_react_vite_antd() {
     fi
 
     echo "Creating project: $PROJECT_NAME (Vite + React 19 + Ant Design + TypeScript)"
-    npx create-vite@latest "$PROJECT_NAME" --template react-ts
+    npx create-vite@latest "$PROJECT_NAME" --template react-ts --no-immediate
 
     cd "$PROJECT_NAME" || return 1
 

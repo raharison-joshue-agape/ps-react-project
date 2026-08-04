@@ -9,7 +9,7 @@ new_react_vite_hero_ui() {
     fi
 
     echo "Creating project: $PROJECT_NAME (Vite + React 19 + Hero UI + TypeScript)"
-    npx create-vite@latest "$PROJECT_NAME" --template react-ts
+    npx create-vite@latest "$PROJECT_NAME" --template react-ts --no-immediate
 
     cd "$PROJECT_NAME" || return 1
 

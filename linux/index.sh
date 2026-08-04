@@ -45,7 +45,7 @@ EOF
 
 new_react_vite() {
     local PROJECT_NAME="$1"
-    npx create-vite@latest "$PROJECT_NAME" --template react-ts
+    npx create-vite@latest "$PROJECT_NAME" --template react-ts --no-immediate
 }
 
 new_react() {
