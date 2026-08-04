@@ -48,7 +48,7 @@ Un ensemble de fonctions pour **Bash (Linux)**, **Zsh (macOS)** et **PowerShell 
 | | |
 |---|---|
 | ⚡ **Scaffolding en une commande** | Génère un projet React 19 + Vite + TypeScript pré-configuré (alias `@`, router, thème) depuis une seule commande |
-| 🎨 **9 bibliothèques UI/UX** | Material UI, Shadcn UI, Hero UI, Chakra UI, React Bootstrap, Mantine, Ant Design, DaisyUI + template de base |
+| 🎨 **10 bibliothèques UI/UX** | Material UI, Shadcn UI, Hero UI, Chakra UI, React Bootstrap, Mantine, Ant Design, DaisyUI, PrimeReact + template de base |
 | ⏩ **Création non-bloquante** | Flag `--no-immediate` : `create-vite` ne lance pas le serveur de dev avant la configuration |
 | 🔗 **Alias `@` pré-configuré** | `@` → `src/` dans `vite.config.ts` et `tsconfig.app.json` (`paths: { "@/*": ["./src/*"] }`) |
 | 🧭 **React Router** | Layout par défaut, page `/home` et page **404** stylée |
@@ -262,6 +262,7 @@ Affiche un menu interactif :
 | 7  | Vite + Mantine          | Modern hooks-first component library          |
 | 8  | Vite + Ant Design       | Enterprise UI design system                   |
 | 9  | Vite + DaisyUI          | Pure CSS Tailwind components                  |
+| 10 | Vite + PrimeReact       | Enterprise-ready UI component library         |
 
 > 💡 Le nom du projet est optionnel : laissez vide pour le saisir interactivement.
 
@@ -290,6 +291,7 @@ New-ReactViteMantine myapp
 | `new_react_vite_mantine` | `New-ReactViteMantine` | Mantine |
 | `new_react_vite_antd` | `New-ReactViteAntd` | Ant Design |
 | `new_react_vite_daisy_ui` | `New-ReactViteDaisyUi` | DaisyUI |
+| `new_react_vite_primereact` | `New-ReactVitePrimeReact` | PrimeReact |
 
 Chaque commande scaffolde le projet (`create-vite` avec `--no-immediate`), installe les dépendances de la bibliothèque, configure l'alias `@`, React Router et le sélecteur de thème, demande si vous voulez **Prettier** et **Git**, puis lance `npm run dev`.
 
@@ -331,6 +333,7 @@ Le composant **ToggleMode** est adapté à chaque bibliothèque :
 | Ant Design | `Segmented` |
 | Mantine | `SegmentedControl` |
 | DaisyUI | Boutons `join` |
+| PrimeReact | Boutons `Button` (groupe d'icônes) |
 
 ### 📂 Structure générée
 
@@ -369,7 +372,8 @@ L'implémentation suit une **architecture modulaire en couches**, chaque couche 
 ┌────────────────────────────┐
 │  Modules bibliothèques UI  │  materialUI.sh/.zsh/.ps1
 │                            │  shadecnUI, heroUI, chakraUI,
-│                            │  reactBootstrap, antd, mantine, daisyui
+│                            │  reactBootstrap, antd, mantine, daisyui,
+│                            │  primereact
 └────────────┬───────────────┘
              ▼
 ┌────────────────────────────┐
@@ -397,6 +401,7 @@ L'implémentation suit une **architecture modulaire en couches**, chaque couche 
 | `antd.sh` / `.zsh` / `.ps1` | `new_react_vite_antd` / `New-ReactViteAntd` |
 | `mantine.sh` / `.zsh` / `.ps1` | `new_react_vite_mantine` / `New-ReactViteMantine` |
 | `daisyui.sh` / `.zsh` / `.ps1` | `new_react_vite_daisy_ui` / `New-ReactViteDaisyUi` |
+| `primereact.sh` / `.zsh` / `.ps1` | `new_react_vite_primereact` / `New-ReactVitePrimeReact` |
 
 > 💡 **macOS** expose les **mêmes noms de fonctions que Linux** (scripts `.zsh`) — seule l'installation diffère (`~/.zshrc`).
 
@@ -416,6 +421,7 @@ react-aliases-project/
 │   ├── antd.sh               # new_react_vite_antd
 │   ├── mantine.sh            # new_react_vite_mantine
 │   ├── daisyui.sh            # new_react_vite_daisy_ui
+│   ├── primereact.sh         # new_react_vite_primereact
 │   └── README.md             # Guide d'installation Linux
 ├── macos/                    # Implémentation Zsh pour macOS
 │   ├── index.zsh             # Point d'entrée (charge tous les modules)
@@ -427,6 +433,7 @@ react-aliases-project/
 │   ├── antd.zsh              # new_react_vite_antd
 │   ├── mantine.zsh           # new_react_vite_mantine
 │   ├── daisyui.zsh           # new_react_vite_daisy_ui
+│   ├── primereact.zsh        # new_react_vite_primereact
 │   └── README.md             # Guide d'installation macOS
 ├── windows/                  # Implémentation PowerShell pour Windows
 │   ├── index.ps1             # Point d'entrée (charge tous les modules)
@@ -438,6 +445,7 @@ react-aliases-project/
 │   ├── antd.ps1              # New-ReactViteAntd
 │   ├── mantine.ps1           # New-ReactViteMantine
 │   ├── daisyui.ps1           # New-ReactViteDaisyUi
+│   ├── primereact.ps1        # New-ReactVitePrimeReact
 │   └── README.md             # Guide d'installation Windows
 └── README.md                 # Ce fichier
 ```

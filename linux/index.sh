@@ -12,6 +12,7 @@ _react_aliases_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "$_react_aliases_root/antd.sh"
 . "$_react_aliases_root/mantine.sh"
 . "$_react_aliases_root/daisyui.sh"
+. "$_react_aliases_root/primereact.sh"
 
 install_prettier() {
     echo "Installation de Prettier..."
@@ -73,10 +74,12 @@ new_react() {
     echo "     Enterprise UI design system"
     echo "  9. Vite + DaisyUI"
     echo "     Pure CSS Tailwind components"
+    echo "  10. Vite + PrimeReact"
+    echo "     Enterprise-ready UI component library"
     echo ""
 
     local PROJECT_CHOICE
-    read -r -p "Enter choice (1-9): " PROJECT_CHOICE
+    read -r -p "Enter choice (1-10): " PROJECT_CHOICE
 
     if [ -z "$PROJECT_NAME" ]; then
         read -r -p "Project name: " PROJECT_NAME
@@ -92,6 +95,7 @@ new_react() {
         7) new_react_vite_mantine "$PROJECT_NAME" ;;
         8) new_react_vite_antd "$PROJECT_NAME" ;;
         9) new_react_vite_daisy_ui "$PROJECT_NAME" ;;
+        10) new_react_vite_primereact "$PROJECT_NAME" ;;
         *)
             echo "Choix invalide. Création d'un projet Vite de base."
             new_react_vite "$PROJECT_NAME"

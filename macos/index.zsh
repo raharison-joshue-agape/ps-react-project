@@ -12,6 +12,7 @@ _react_aliases_root="${0:A:h}"
 . "$_react_aliases_root/antd.zsh"
 . "$_react_aliases_root/mantine.zsh"
 . "$_react_aliases_root/daisyui.zsh"
+. "$_react_aliases_root/primereact.zsh"
 
 install_prettier() {
     echo "Installation de Prettier..."
@@ -73,10 +74,12 @@ new_react() {
     echo "     Enterprise UI design system"
     echo "  9. Vite + DaisyUI"
     echo "     Pure CSS Tailwind components"
+    echo "  10. Vite + PrimeReact"
+    echo "     Enterprise-ready UI component library"
     echo ""
 
     local PROJECT_CHOICE
-    read -r "PROJECT_CHOICE?Enter choice (1-9): "
+    read -r "PROJECT_CHOICE?Enter choice (1-10): "
 
     if [ -z "$PROJECT_NAME" ]; then
         read -r "PROJECT_NAME?Project name: "
@@ -92,6 +95,7 @@ new_react() {
         7) new_react_vite_mantine "$PROJECT_NAME" ;;
         8) new_react_vite_antd "$PROJECT_NAME" ;;
         9) new_react_vite_daisy_ui "$PROJECT_NAME" ;;
+        10) new_react_vite_primereact "$PROJECT_NAME" ;;
         *)
             echo "Choix invalide. Création d'un projet Vite de base."
             new_react_vite "$PROJECT_NAME"

@@ -6,6 +6,7 @@
 . "$PSScriptRoot\antd.ps1"
 . "$PSScriptRoot\mantine.ps1"
 . "$PSScriptRoot\daisyui.ps1"
+. "$PSScriptRoot\primereact.ps1"
 
 $prettierrc_content = @'
 {
@@ -99,6 +100,7 @@ function New-React {
         @{ Id = 7; Name = "Vite + Mantine"; Desc = "Modern hooks-first component library" }
         @{ Id = 8; Name = "Vite + Ant Design"; Desc = "Enterprise UI design system" }
         @{ Id = 9; Name = "Vite + DaisyUI"; Desc = "Pure CSS Tailwind components" }
+        @{ Id = 10; Name = "Vite + PrimeReact"; Desc = "Enterprise-ready UI component library" }
     )
 
     foreach ($c in $CHOICES) {
@@ -121,6 +123,7 @@ function New-React {
         "7" { New-ReactViteMantine $PROJECT_NAME }
         "8" { New-ReactViteAntd $PROJECT_NAME }
         "9" { New-ReactViteDaisyUi $PROJECT_NAME }
+        "10" { New-ReactVitePrimeReact $PROJECT_NAME }
         default {
             Write-Host "Choix invalide. Création d'un projet Vite de base." -ForegroundColor Yellow
             New-ReactVite $PROJECT_NAME
