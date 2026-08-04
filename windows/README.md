@@ -1,0 +1,243 @@
+<div align="center">
+
+# ⚡ ReactJS Project Aliases — Windows
+
+### Scaffold des projets **React 19 + Vite + TypeScript** pré-configurés directement depuis **PowerShell**
+
+Des fonctions courtes et mémorisables qui remplacent les longues séquences de configuration par une seule commande.
+
+[![PowerShell](https://img.shields.io/badge/PowerShell-5.1%2B-5391FE?style=for-the-badge&logo=powershell&logoColor=white)](https://learn.microsoft.com/powershell/)
+[![Windows](https://img.shields.io/badge/Windows-ready-0078D6?style=for-the-badge&logo=windows&logoColor=white)](https://www.microsoft.com/windows)
+[![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-ready-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vite.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+
+</div>
+
+---
+
+## 📑 Table des matières
+
+- [✨ Aperçu](#-aperçu)
+- [🧰 Prérequis](#-prérequis)
+- [📦 Installation](#-installation)
+- [🚀 Utilisation](#-utilisation)
+- [📖 Aide intégrée](#-aide-intégrée)
+- [🧹 Désinstallation](#-désinstallation)
+- [🛟 Dépannage](#-dépannage)
+- [🤝 Contribution](#-contribution)
+
+---
+
+## ✨ Aperçu
+
+Au lieu de taper de longues commandes de configuration répétitives, vous utilisez des fonctions courtes qui scaffoldent un projet **React 19 + Vite + TypeScript** complet et pré-configuré en quelques secondes :
+
+```powershell
+New-React myapp        # menu interactif : 9 bibliothèques UI/UX au choix
+New-ReactVite myapp    # template Vite + React + TypeScript de base
+New-ReactViteMantine myapp   # scaffold direct avec une bibliothèque précise
+Install-Prettier       # configure Prettier dans le projet courant
+```
+
+Les raccourcis sont organisés en modules thématiques chargés automatiquement depuis un **point d'entrée unique** : une seule ligne suffit dans votre profil PowerShell. Chaque fonction dispose d'une aide commentée (`Get-Help`), et la syntaxe est identique à celle de la [version Linux](../README.md#-installation-linux) (`New-React` ⇄ `new_react`).
+
+---
+
+## 🧰 Prérequis
+
+| Exigence | Détail |
+|---|---|
+| **Système** | Windows 10 ou 11 |
+| **Shell** | Windows PowerShell 5.1+ ou PowerShell 7 |
+| **Git** | [Git for Windows](https://git-scm.com/download/win) installé et disponible dans le `PATH` (initialisation Git optionnelle) |
+| **Node.js** | Node.js 18+ avec `npm` disponible dans le `PATH` (utilisé pour scaffolder et installer les dépendances) |
+
+---
+
+## 📦 Installation
+
+### 1. Copier le module dans votre répertoire de configuration
+
+```powershell
+New-Item -ItemType Directory -Path "$HOME\.config\alias" -Force
+Copy-Item -Path "windows" -Destination "$HOME\.config\alias\react-aliases-project\" -Recurse
+```
+
+### 2. Vérifier que votre profil PowerShell existe
+
+```powershell
+Test-Path $PROFILE
+```
+
+- `True` → votre profil existe, passez à l'étape 4.
+- `False` → créez-le :
+
+```powershell
+New-Item -Path $PROFILE -ItemType File -Force
+```
+
+### 3. Ouvrir votre profil
+
+```powershell
+notepad $PROFILE
+```
+
+ou avec Visual Studio Code :
+
+```powershell
+code $PROFILE
+```
+
+### 4. Importer les raccourcis
+
+Ajoutez la ligne suivante à votre profil :
+
+```powershell
+. "$HOME\.config\alias\react-aliases-project\windows\index.ps1"
+```
+
+`index.ps1` est le point d'entrée. Il source (`dot-source`) chaque module situé dans son propre répertoire, si bien que les raccourcis fonctionnent quel que soit l'endroit où le projet a été copié.
+
+### 5. Recharger votre profil
+
+```powershell
+. $PROFILE
+```
+
+---
+
+## 🚀 Utilisation
+
+Les raccourcis se comportent comme des commandes PowerShell natives :
+
+```powershell
+New-React myapp        # scaffolde un projet (menu interactif 1-9)
+New-ReactVite myapp    # template Vite + React + TS de base
+New-ReactViteMaterialUi myapp   # Material UI
+New-ReactViteDaisyUi myapp      # DaisyUI
+Install-Prettier       # configure Prettier (optionnel)
+Get-Help New-React     # affiche la documentation commentée
+```
+
+### 📦 Créer un projet
+
+```powershell
+New-React myapp
+```
+
+Affiche un menu interactif, crée le projet avec `create-vite` (sans lancer le serveur avant configuration grâce à `--no-immediate`), installe les dépendances de la bibliothèque choisie, puis pré-configure l'alias `@`, React Router et le sélecteur de thème.
+
+> 💡 Le nom du projet est optionnel : laissez vide pour le saisir interactivement.
+
+| #  | Template                | Description                                   |
+|----|-------------------------|-----------------------------------------------|
+| 1  | Vite + React (base)     | Plain React + TypeScript template             |
+| 2  | Vite + Material UI      | Google Material Design components             |
+| 3  | Vite + Shadcn UI        | Tailwind + Radix accessible components        |
+| 4  | Vite + Hero UI          | Tailwind + React Aria components              |
+| 5  | Vite + Chakra UI        | Headless-friendly component library           |
+| 6  | Vite + React Bootstrap  | Bootstrap components for React                |
+| 7  | Vite + Mantine          | Modern hooks-first component library          |
+| 8  | Vite + Ant Design       | Enterprise UI design system                   |
+| 9  | Vite + DaisyUI          | Pure CSS Tailwind components                  |
+
+À la fin de la configuration, le script demande si vous voulez **Prettier** et **Git**, puis lance `npm run dev` (serveur sur **http://localhost:5173**).
+
+### 🎨 Créer un projet avec une bibliothèque précise
+
+```powershell
+New-ReactViteMaterialUi myapp
+New-ReactViteShadecnUi myapp
+New-ReactViteHeroUi myapp
+New-ReactViteChakraUi myapp
+New-ReactViteBootstrap myapp
+New-ReactViteMantine myapp
+New-ReactViteAntd myapp
+New-ReactViteDaisyUi myapp
+```
+
+### 🖥️ Créer un projet Vite de base
+
+```powershell
+New-ReactVite myapp
+```
+
+Crée un projet **Vite + React + TypeScript** (template `react-ts` de `create-vite`) sans bibliothèque supplémentaire.
+
+### 📝 Configurer Prettier
+
+```powershell
+Install-Prettier
+```
+
+Installe Prettier en dépendance de développement, ajoute le script `npm run format`, et génère `.prettierrc` + `.prettierignore` (semi, single quotes, trailing commas, printWidth 100, tabWidth 4, endOfLine `lf`).
+
+### 🧱 Ce que chaque template inclut
+
+| Élément | Détail |
+|---|---|
+| **React 19 + TypeScript** | Généré avec `create-vite` (`react-ts`) |
+| **Alias `@`** | → `src/` dans `vite.config.ts` et `tsconfig.app.json` (`paths: { "@/*": ["./src/*"] }`) |
+| **React Router** | Layout par défaut, page `/home` et page **404** personnalisée |
+| **ToggleMode** | Sélecteur Clair / Sombre / Système, adapté à chaque bibliothèque |
+| **Prettier** *(optionnel)* | `.prettierrc` + `.prettierignore`, script `npm run format` |
+| **Git** *(optionnel)* | `git init` + premier commit `Initial commit` |
+| **Serveur de dev** | Port `5173`, `host: '0.0.0.0'`, ouverture auto du navigateur |
+
+Le composant **ToggleMode** est adapté à chaque bibliothèque :
+
+| Bibliothèque | Sélecteur de thème |
+|---|---|
+| Material UI | `Select` MUI |
+| Shadcn UI | `DropdownMenu` |
+| Hero UI | `Select` |
+| Chakra UI | `Select` + `next-themes` |
+| React Bootstrap | `ButtonGroup` d'icônes |
+| Ant Design | `Segmented` |
+| Mantine | `SegmentedControl` |
+| DaisyUI | Boutons `join` |
+
+---
+
+## 📖 Aide intégrée
+
+| Commande | Description |
+|---|---|
+| `Get-Help <fonction>` | Documentation commentée de n'importe quel raccourci (paramètres, exemples) |
+
+```powershell
+Get-Help New-React
+Get-Help New-ReactViteMantine
+Get-Help New-ReactViteMaterialUi -Detailed
+```
+
+---
+
+## 🧹 Désinstallation
+
+1. Supprimez la ligne d'import de `$PROFILE`.
+2. Supprimez le répertoire :
+
+```powershell
+Remove-Item -Path "$HOME\.config\alias\react-aliases-project" -Recurse -Force
+```
+
+---
+
+## 🛟 Dépannage
+
+| Symptôme | Solution |
+|---|---|
+| Les raccourcis sont indisponibles | Vérifiez le chemin d'import dans `$PROFILE`, puis rechargez avec `. $PROFILE`. |
+| `❌ node is not recognized` | Installez Node.js 18+ et assurez-vous qu'il est disponible dans le `PATH`. |
+| Le serveur de dev ne démarre pas | Vérifiez que `npm install` a été exécuté (avec `--no-immediate`, create-vite n'installe pas automatiquement). |
+| Alias `@` non résolu | Relancez `npm install` (alias défini dans `vite.config.ts` + `tsconfig.app.json`). |
+| Profil introuvable | Vérifiez que `$PROFILE` existe avec `Test-Path $PROFILE`, en le créant si nécessaire. |
+
+---
+
+## 🤝 Contribution
+
+Voir le [README du dépôt](../README.md#-contribution) pour les consignes de contribution, ou ouvrez une *issue*.
